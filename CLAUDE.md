@@ -183,6 +183,10 @@ Measured at end of session:
   ```
 
 - **Do not commit or push without asking.** The identity question is settled, but the owner still decides when history is written.
+- **Push access runs through the owner's personal account** (2026-08-20 decision). Windows Credential Manager on this machine stores only `Nswchoeffler` credentials, so `Nswchoeffler` was added as a collaborator on the private repo rather than storing a second credential for `oupikappweb`.
+  - Commit *authorship* is still `oupikappweb` — this affects only who is permitted to push.
+  - This is a known, accepted deviation from `BUILD-SPEC.md` §7, which wants everything chapter-owned. Revisit at officer turnover: if `Nswchoeffler` loses access, pushes break.
+  - Symptom to recognise: GitHub returns **"Repository not found"** for a private repo on *any* auth failure — unauthenticated, wrong account, or an unaccepted collaborator invite. It almost never means the repo is actually missing.
 
 ---
 
