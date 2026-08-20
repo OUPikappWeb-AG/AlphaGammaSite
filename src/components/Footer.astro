@@ -1,0 +1,110 @@
+---
+/**
+ * Site footer.
+ *
+ * Every value here comes from chapter.json. Fields still holding a TODO
+ * placeholder are omitted rather than printed — publishing the literal word
+ * "TODO" to a parent is worse than publishing nothing. `npm run dev` shows a
+ * warning listing exactly what is missing; see PendingFields.astro.
+ */
+import { chapter, isTodo } from '../lib/chapter';
+import Wordmark from './Wordmark.astro';
+import PendingFields from './PendingFields.astro';
+
+const { identity, links, contact, lastReviewed } = chapter;
+
+const hasEmail = !isTodo(contact.chapterEmail);
+const hasAddress = !isTodo(contact.houseAddress);
+const hasInstagram = !isTodo(links.instagram);
+
+/** "18 August 2026" reads unambiguously to every audience. */
+const reviewedLabel = new Date(`${lastReviewed}T00:00:00`).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const externalLinks = [
+  { label: 'Pi Kappa Phi Fraternity', href: links.national },
+  { label: 'The Ability Experience', href: links.abilityExperience },
+  ...(hasInstagram ? [{ label: 'Instagram', href: links.instagram }] : []),
+];
+---
+
+<PendingFields />
+
+<footer class="mt-24 border-t-2 border-gold bg-ink text-paper">
+  <div class="mx-auto max-w-6xl px-5 py-14 sm:px-8">
+    <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="lg:col-span-2">
+        <Wordmark tone="light" />
+        <p class="mt-4 max-w-xs text-sm leading-relaxed text-paper/70">
+          {identity.chapterName} Chapter of Pi Kappa Phi at the {identity.school}.
+        </p>
+      </div>
+
+      <div>
+        <h2 class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-gold">Contact</h2>
+        <ul class="mt-4 space-y-2 text-sm text-paper/70">
+          {
+            hasEmail && (
+              <li>
+                <a
+                  href={`mailto:${contact.chapterEmail}`}
+                  class="underline-offset-4 hover:text-paper hover:underline"
+                >
+                  {contact.chapterEmail}
+                </a>
+              </li>
+            )
+          }
+          {hasAddress && <li class="leading-relaxed">{contact.houseAddress}</li>}
+          {
+            !hasEmail && !hasAddress && (
+              <li class="text-paper/50">Contact details coming soon.</li>
+            )
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-gold">Elsewhere</h2>
+        <ul class="mt-4 space-y-2 text-sm text-paper/70">
+          {
+            externalLinks.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="underline-offset-4 hover:text-paper hover:underline"
+                >
+                  {link.label}
+                  <span aria-hidden="true"> ↗</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div
+      class="mt-12 flex flex-col gap-4 border-t border-paper/15 pt-6 text-xs leading-relaxed text-paper/60 sm:flex-row sm:items-start sm:justify-between"
+    >
+      <p class="max-w-2xl">
+        This site is maintained by the {identity.chapterName} Chapter of Pi Kappa Phi at the {
+          identity.school
+        }. It is not an official publication of Pi Kappa Phi Fraternity.
+      </p>
+
+      <!--
+        Rendered from chapter.json → lastReviewed. A visibly stale date is the
+        point: it pressures the next officer to actually review the content.
+      -->
+      <p class="shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-paper/50">
+        Last reviewed <time datetime={lastReviewed}>{reviewedLabel}</time>
+      </p>
+    </div>
+  </div>
+</footer>

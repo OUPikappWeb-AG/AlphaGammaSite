@@ -1,0 +1,138 @@
+---
+/**
+ * Primary navigation.
+ *
+ * "Member Sign In" is intentionally NOT a nav link. It is an outline button,
+ * visually separated and pushed right, because it serves current members
+ * while every other element on the page serves visitors who are still
+ * deciding whether to trust the chapter.
+ *
+ * This component holds the only client-side JavaScript on the site: the
+ * mobile menu toggle.
+ */
+import { chapter } from '../lib/chapter';
+import { liveNavItems, isCurrent } from '../lib/nav';
+import Wordmark from './Wordmark.astro';
+
+const items = liveNavItems();
+const pathname = Astro.url.pathname;
+---
+
+<header class="border-b border-ink/10 bg-paper">
+  <nav class="mx-auto flex max-w-6xl items-center gap-6 px-5 py-4 sm:px-8" aria-label="Primary">
+    <a href="/" class="shrink-0 rounded-xs" aria-label="Pi Kappa Phi, Alpha Gamma Chapter — home">
+      <Wordmark />
+    </a>
+
+    <!-- Desktop links -->
+    <ul class="ml-auto hidden items-center gap-7 md:flex">
+      {
+        items.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              aria-current={isCurrent(item.href, pathname) ? 'page' : undefined}
+              class="text-sm text-ink/80 underline-offset-4 transition-colors hover:text-royal hover:underline aria-[current=page]:text-royal aria-[current=page]:underline"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!--
+      The portal URL is read from chapter.json → links.memberPortal and is
+      never hardcoded. Change it there and it changes in every place at once.
+    -->
+    <a
+      href={chapter.links.memberPortal}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="ml-auto hidden shrink-0 items-center gap-1.5 rounded-xs border border-royal px-3.5 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-royal transition-colors hover:bg-royal hover:text-paper md:ml-0 md:inline-flex"
+    >
+      Member sign in
+      <span aria-hidden="true">↗</span>
+      <span class="sr-only">(opens in a new tab)</span>
+    </a>
+
+    <!-- Mobile toggle -->
+    <button
+      type="button"
+      id="menu-toggle"
+      class="ml-auto inline-flex items-center gap-2 rounded-xs border border-ink/20 px-3 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ink md:hidden"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <span id="menu-toggle-label">Menu</span>
+    </button>
+  </nav>
+
+  <!--
+    Rendered in the HTML and hidden with the `hidden` attribute rather than
+    injected by script, so it still exists for search engines and for anyone
+    whose JavaScript fails to load.
+  -->
+  <div id="mobile-menu" class="border-t border-ink/10 md:hidden" hidden>
+    <ul class="mx-auto max-w-6xl px-5 py-2 sm:px-8">
+      {
+        items.map((item) => (
+          <li class="border-b border-ink/5 last:border-0">
+            <a
+              href={item.href}
+              aria-current={isCurrent(item.href, pathname) ? 'page' : undefined}
+              class="block py-3.5 text-ink/85 aria-[current=page]:text-royal"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+      <li class="py-3.5">
+        <a
+          href={chapter.links.memberPortal}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-1.5 rounded-xs border border-royal px-3.5 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-royal"
+        >
+          Member sign in
+          <span aria-hidden="true">↗</span>
+          <span class="sr-only">(opens in a new tab)</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</header>
+
+<script>
+  /**
+   * Mobile menu toggle — the site's only client-side JavaScript.
+   *
+   * Uses the `hidden` attribute so the menu is genuinely removed from the
+   * accessibility tree when closed, and keeps `aria-expanded` in sync so
+   * screen readers announce the state correctly.
+   */
+  const toggle = document.getElementById('menu-toggle');
+  const label = document.getElementById('menu-toggle-label');
+  const menu = document.getElementById('mobile-menu');
+
+  if (toggle && menu && label) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      menu.hidden = !open;
+      label.textContent = open ? 'Close' : 'Menu';
+    };
+
+    toggle.addEventListener('click', () => {
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    // Escape closes the menu and returns focus to the button that opened it.
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>

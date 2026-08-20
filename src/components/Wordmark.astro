@@ -1,0 +1,34 @@
+---
+/**
+ * The chapter wordmark: Greek letters, a hairline gold rule, chapter name.
+ *
+ * Deliberately typographic rather than a logo file. Spec §11 leaves open
+ * whether national HQ permits the coat of arms on a public site, so nothing
+ * here depends on an official mark — these are plain Greek letters.
+ */
+import { chapter } from '../lib/chapter';
+
+interface Props {
+  /** `light` for dark backgrounds such as the footer. */
+  tone?: 'dark' | 'light';
+  class?: string;
+}
+
+const { tone = 'dark', class: className = '' } = Astro.props;
+
+const letters = tone === 'dark' ? 'text-ink' : 'text-paper';
+const name = tone === 'dark' ? 'text-slate' : 'text-paper/70';
+---
+
+<span class:list={['inline-flex items-baseline gap-2.5', className]}>
+  <span class:list={['font-display text-xl leading-none tracking-tight', letters]}>
+    <span aria-hidden="true">ΠΚΦ</span>
+    <span class="sr-only">Pi Kappa Phi</span>
+  </span>
+
+  <span class="h-4 w-px shrink-0 self-center bg-gold" aria-hidden="true"></span>
+
+  <span class:list={['font-mono text-[0.6875rem] uppercase leading-none tracking-[0.14em]', name]}>
+    {chapter.identity.chapterName}
+  </span>
+</span>

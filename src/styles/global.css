@@ -1,0 +1,178 @@
+@import 'tailwindcss';
+
+/*
+ * Self-hosted fonts. Loaded here so no request ever leaves for Google — that
+ * is both a privacy win and a performance one.
+ *
+ * Newsreader and Public Sans ship as variable fonts, so one file covers every
+ * weight. IBM Plex Mono has no variable build, so we pull only the two weights
+ * the design actually uses. Each @fontsource stylesheet is split by
+ * unicode-range, so a visitor downloads the latin subset and nothing else.
+ */
+@import '@fontsource-variable/newsreader';
+@import '@fontsource-variable/public-sans';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+/* ------------------------------------------------------------------ *
+ * Design tokens
+ *
+ * Tailwind v4 is configured in CSS, not in a tailwind.config.mjs. Anything
+ * declared in @theme becomes a utility automatically: --color-royal gives you
+ * text-royal, bg-royal, border-royal, and so on.
+ * ------------------------------------------------------------------ */
+
+@theme {
+  /* Palette — derived from Pi Kappa Phi's gold, white, and royal blue. */
+
+  /** Primary ground and headings. 16.6:1 on paper. */
+  --color-ink: #0e1626;
+  /** Secondary surfaces and links. 10.1:1 on paper. */
+  --color-royal: #1d3b6e;
+  /** Page background. */
+  --color-paper: #f7f5f0;
+  /** Secondary text and captions. 5.5:1 on paper. */
+  --color-slate: #5b6472;
+
+  /**
+   * Accent rules and stat emphasis. Used sparingly.
+   *
+   * WARNING: only 2.2:1 on paper — this FAILS contrast and must never carry
+   * body text on a light background. It is legal as a hairline rule, as a
+   * large decorative mark, or as text on ink (7.5:1). For gold-looking text
+   * on paper, use --color-gold-text below.
+   */
+  --color-gold: #c8a247;
+  /** Darkened gold for text use on paper. 5.3:1 — passes AA. */
+  --color-gold-text: #7e621b;
+
+  /** Reserved exclusively for The Ability Experience. Nowhere else. 8.3:1. */
+  --color-rose: #8c1d2e;
+
+  /* Type */
+  --font-display: 'Newsreader Variable', 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-body: 'Public Sans Variable', 'Public Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono Variable', 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+
+  /* Radius — minimal on purpose. Avoids the soft-rounded SaaS look. */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Base
+ * ------------------------------------------------------------------ */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.011em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /*
+   * Every number on this site is monospaced with tabular figures so that
+   * columns of statistics align. This is the design's signature move: it makes
+   * the data read as reported rather than claimed.
+   */
+  .font-mono,
+  [class*='font-mono'] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  /* Visible keyboard focus everywhere. Never remove this without a replacement. */
+  :focus-visible {
+    outline: 2px solid var(--color-royal);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  /* Only show focus rings for keyboard users, but never suppress them entirely. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-gold) 35%, transparent);
+    color: var(--color-ink);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Motion
+ *
+ * The only animation on the site is the Chapter Record reveal. Anyone who has
+ * asked their operating system to reduce motion sees the finished state
+ * immediately, with no transition.
+ * ------------------------------------------------------------------ */
+
+@layer components {
+  .reveal {
+    opacity: 0;
+    transform: translateY(0.75rem);
+    transition:
+      opacity 700ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /*
+   * Fallback: if JavaScript never runs, the reveal class would leave content
+   * invisible forever. `.no-js` is set on <html> and cleared by the reveal
+   * script, so content is always readable without JS.
+   */
+  .no-js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

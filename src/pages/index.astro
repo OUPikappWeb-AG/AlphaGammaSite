@@ -1,0 +1,109 @@
+---
+/**
+ * Home page.
+ *
+ * The reader to design for is a parent who just heard "I'm rushing Pi Kappa
+ * Phi" and typed it into Google. The page has one job: give them enough
+ * verifiable substance that they close the tab relieved.
+ *
+ * All prose here is placeholder copy marked "Example". Replace it with real
+ * writing before launch; keep the voice plain, declarative, and specific.
+ */
+import Base from '../layouts/Base.astro';
+import ChapterRecord from '../components/ChapterRecord.astro';
+import CTAButton from '../components/CTAButton.astro';
+import { chapter, isTodo } from '../lib/chapter';
+
+const { identity, links } = chapter;
+
+const founded = isTodo(identity.founded) ? null : identity.founded;
+---
+
+<Base
+  title="Alpha Gamma Chapter"
+  description="Example description. The Alpha Gamma Chapter of Pi Kappa Phi at the University of Oklahoma — academics, service, and how to join."
+>
+  <!-- ── Hero ──────────────────────────────────────────────────────── -->
+  <section class="mx-auto max-w-6xl px-5 pb-20 pt-16 sm:px-8 sm:pb-28 sm:pt-24">
+    <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-slate">
+      {identity.chapterName} Chapter
+      {founded && <span class="text-ink/30"> · </span>}
+      {founded && <span>Chartered {founded}</span>}
+    </p>
+
+    <h1 class="mt-5 max-w-4xl text-[2.5rem] leading-[1.08] sm:text-6xl">
+      Pi Kappa Phi at the University of Oklahoma
+    </h1>
+
+    <div class="mt-8 h-px w-24 bg-gold" aria-hidden="true"></div>
+
+    <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate sm:text-xl">
+      Example lede paragraph. Two or three plain sentences describing what this chapter is and what
+      it expects of its members. Numbers over adjectives. No exclamation points.
+    </p>
+
+    <div class="mt-10 flex flex-wrap gap-3">
+      <CTAButton href="/join">How to join</CTAButton>
+      <CTAButton href={links.abilityExperience} variant="outline" external>
+        Our philanthropy
+      </CTAButton>
+    </div>
+  </section>
+
+  <!-- ── The Chapter Record — the signature element ─────────────────── -->
+  <ChapterRecord />
+
+  <!-- ── The Ability Experience ─────────────────────────────────────── -->
+  <!--
+    Rose is reserved for this section and nothing else on the entire site.
+    Used consistently, the colour itself comes to mean "philanthropy" without
+    anyone having to explain it. Do not borrow it for anything else.
+  -->
+  <section aria-labelledby="ability" class="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
+    <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16">
+      <div>
+        <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-rose">
+          Our philanthropy
+        </p>
+        <h2 id="ability" class="mt-3 text-3xl leading-tight sm:text-4xl">
+          The Ability Experience
+        </h2>
+      </div>
+
+      <div class="border-l-2 border-rose pl-6 sm:pl-8">
+        <p class="text-base leading-relaxed text-slate sm:text-lg">
+          Example paragraph explaining, in plain language and without jargon, what The Ability
+          Experience is and what this chapter actually does for it.
+        </p>
+        <p class="mt-4 text-base leading-relaxed text-slate sm:text-lg">
+          Example second paragraph covering Journey of Hope, Build America, and War of the Roses,
+          and naming the local partners this chapter works with.
+        </p>
+
+        <div class="mt-8">
+          <CTAButton href={links.abilityExperience} variant="outline" external>
+            About The Ability Experience
+          </CTAButton>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Recruitment ────────────────────────────────────────────────── -->
+  <section class="border-t border-ink/10 bg-ink text-paper">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-8 px-5 py-16 sm:px-8 sm:py-20 lg:flex-row lg:items-center lg:justify-between"
+    >
+      <div class="max-w-2xl">
+        <h2 class="text-3xl leading-tight sm:text-4xl">Example recruitment headline</h2>
+        <p class="mt-4 text-base leading-relaxed text-paper/70 sm:text-lg">
+          Example paragraph. Say who should reach out, what happens next, and how long it takes.
+        </p>
+      </div>
+
+      <div class="shrink-0">
+        <CTAButton href="/join" variant="onDark">Start here</CTAButton>
+      </div>
+    </div>
+  </section>
+</Base>

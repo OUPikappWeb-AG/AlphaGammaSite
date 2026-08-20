@@ -1,0 +1,38 @@
+---
+/**
+ * A development-only reminder of what still needs filling in.
+ *
+ * The public site silently omits placeholder values, which is correct for
+ * visitors but makes it easy for an officer to forget what is missing. This
+ * banner closes that loop: it lists every launch-critical TODO, and it appears
+ * ONLY when running `npm run dev` locally. It is stripped from the production
+ * build entirely, so no visitor can ever see it.
+ */
+import { pendingLaunchFields } from '../lib/chapter';
+
+const pending = import.meta.env.DEV ? pendingLaunchFields() : [];
+---
+
+{
+  pending.length > 0 && (
+    <aside
+      class="border-y-2 border-dashed border-gold-text/40 bg-gold/10 px-5 py-4 text-ink sm:px-8"
+      aria-label="Development notice"
+    >
+      <p class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-gold-text">
+        Local preview only — not shown on the live site
+      </p>
+      <p class="mt-2 text-sm">
+        {pending.length} field{pending.length === 1 ? '' : 's'} in{' '}
+        <code class="font-mono text-[0.8125rem]">src/data/chapter.json</code> still say{' '}
+        <code class="font-mono text-[0.8125rem]">TODO</code>. They are hidden from visitors until
+        filled in.
+      </p>
+      <ul class="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[0.75rem] text-slate">
+        {pending.map((field) => (
+          <li>{field}</li>
+        ))}
+      </ul>
+    </aside>
+  )
+}

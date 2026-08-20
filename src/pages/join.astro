@@ -1,0 +1,171 @@
+---
+/**
+ * /join — recruitment.
+ *
+ * Two audiences read this page: a student deciding whether to reach out, and
+ * a parent checking whether reaching out is safe and sensible. It therefore
+ * ends with a named human and a real email address, which is the single most
+ * effective anxiety-to-conversation converter available to us.
+ *
+ * Deliberately NO dates, times, or locations for events — spec §1 rules out a
+ * public calendar. It is a safety consideration and it always goes stale.
+ */
+import Base from '../layouts/Base.astro';
+import CTAButton from '../components/CTAButton.astro';
+import { chapter, isTodo } from '../lib/chapter';
+
+const { recruitmentChair } = chapter.contact;
+
+const chairName = isTodo(recruitmentChair.name) ? 'Recruitment Chair' : recruitmentChair.name;
+const hasEmail = !isTodo(recruitmentChair.email);
+const hasPhone = !isTodo(recruitmentChair.phone);
+
+/**
+ * Placeholder recruitment steps. Replace the text; keep the shape — a short
+ * numbered sequence is what makes an unfamiliar process feel manageable.
+ */
+const steps = [
+  {
+    title: 'Example first step',
+    body: 'Example description of what a potential new member does first, and roughly how long it takes.',
+  },
+  {
+    title: 'Example second step',
+    body: 'Example description of meeting the chapter, what those conversations are like, and who will be there.',
+  },
+  {
+    title: 'Example third step',
+    body: 'Example description of receiving and accepting a bid, and what the commitment involves.',
+  },
+];
+---
+
+<Base
+  title="Join"
+  description="Example description. How recruitment works at the Alpha Gamma Chapter of Pi Kappa Phi at the University of Oklahoma, and who to contact."
+>
+  <!-- ── Header ────────────────────────────────────────────────────── -->
+  <section class="mx-auto max-w-6xl px-5 pb-14 pt-16 sm:px-8 sm:pt-24">
+    <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-slate">Recruitment</p>
+
+    <h1 class="mt-5 max-w-3xl text-[2.5rem] leading-[1.08] sm:text-5xl">
+      How to join this chapter
+    </h1>
+
+    <div class="mt-8 h-px w-24 bg-gold" aria-hidden="true"></div>
+
+    <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate">
+      Example paragraph. State plainly that there is no obligation in reaching out, and that
+      questions from parents are welcome too.
+    </p>
+  </section>
+
+  <!-- ── Steps ─────────────────────────────────────────────────────── -->
+  <section aria-labelledby="steps" class="mx-auto max-w-6xl px-5 pb-20 sm:px-8 sm:pb-24">
+    <h2 id="steps" class="sr-only">The recruitment process</h2>
+
+    <ol class="grid gap-px border border-ink/10 bg-ink/10 sm:grid-cols-3">
+      {
+        steps.map((step, index) => (
+          <li class="bg-paper p-6 sm:p-8">
+            <span class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-gold-text">
+              Step {String(index + 1).padStart(2, '0')}
+            </span>
+            <h3 class="mt-3 text-xl leading-snug">{step.title}</h3>
+            <p class="mt-3 text-[0.9375rem] leading-relaxed text-slate">{step.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <!-- ── Contact a real person ─────────────────────────────────────── -->
+  <section aria-labelledby="contact" class="border-y-2 border-gold bg-paper">
+    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16">
+        <div>
+          <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-gold-text">
+            Talk to someone
+          </p>
+          <h2 id="contact" class="mt-3 text-3xl leading-tight sm:text-4xl">
+            Questions are welcome
+          </h2>
+          <p class="mt-4 max-w-md text-base leading-relaxed text-slate">
+            Example paragraph. Parents are explicitly invited to write directly.
+          </p>
+        </div>
+
+        <div class="border-l-2 border-gold pl-6 sm:pl-8">
+          <p class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-slate">
+            Recruitment chair
+          </p>
+          <p class="mt-2 text-2xl">{chairName}</p>
+
+          <dl class="mt-6 space-y-3 text-base">
+            {
+              hasEmail && (
+                <div class="flex flex-wrap items-baseline gap-x-3">
+                  <dt class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-slate">
+                    Email
+                  </dt>
+                  <dd>
+                    <a
+                      href={`mailto:${recruitmentChair.email}`}
+                      class="text-royal underline underline-offset-4"
+                    >
+                      {recruitmentChair.email}
+                    </a>
+                  </dd>
+                </div>
+              )
+            }
+
+            {
+              hasPhone && (
+                <div class="flex flex-wrap items-baseline gap-x-3">
+                  <dt class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-slate">
+                    Phone
+                  </dt>
+                  <dd>
+                    <a
+                      href={`tel:${recruitmentChair.phone.replace(/[^\d+]/g, '')}`}
+                      class="text-royal underline underline-offset-4"
+                    >
+                      {recruitmentChair.phone}
+                    </a>
+                  </dd>
+                </div>
+              )
+            }
+          </dl>
+
+          {
+            hasEmail && (
+              <div class="mt-8">
+                <CTAButton href={`mailto:${recruitmentChair.email}`}>Send an email</CTAButton>
+              </div>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Already a member ──────────────────────────────────────────── -->
+  <section class="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+    <div
+      class="flex flex-col gap-5 border border-ink/10 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8"
+    >
+      <div>
+        <h2 class="text-xl leading-snug">Already a member or an alumnus?</h2>
+        <p class="mt-2 text-[0.9375rem] leading-relaxed text-slate">
+          Chapter tools and member resources live in ChapterLink.
+        </p>
+      </div>
+
+      <CTAButton href={chapter.links.memberPortal} variant="outline" external class="shrink-0">
+        Member sign in
+      </CTAButton>
+    </div>
+  </section>
+</Base>

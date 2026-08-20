@@ -1,0 +1,74 @@
+---
+/**
+ * One line of the Chapter Record.
+ *
+ * Typeset as a ledger entry, not a marketing stat card: a small-caps label on
+ * the left, a dotted leader, and a monospaced tabular numeral on the right,
+ * with the reporting period stamped underneath. The mono numerals are the
+ * signature move of the whole design — they make a figure read as *reported*
+ * rather than *claimed*.
+ *
+ * A statistic with no value yet renders an explicit "Not yet reported" instead
+ * of a zero. Publishing an unmeasured 0 would be a false claim.
+ */
+import { formatStat, formatAsOf, isPending, type StatFormat } from '../lib/chapter';
+import type { Stat } from '../data/chapter.schema';
+
+interface Props {
+  /** Short, plain label. Sentence case — it is uppercased by CSS. */
+  label: string;
+  stat: Stat;
+  /** How to render the number. Defaults to a plain integer. */
+  format?: StatFormat;
+  /** Set on the one or two figures that carry the most weight. */
+  emphasis?: boolean;
+  /** Optional clarifying line, e.g. "Campus all-men's average". */
+  note?: string;
+}
+
+const { label, stat, format = 'integer', emphasis = false, note } = Astro.props;
+
+const value = formatStat(stat, format);
+const asOf = formatAsOf(stat);
+const pending = isPending(stat);
+---
+
+<div class="py-4 sm:py-5">
+  <div class="flex items-baseline gap-3">
+    <span class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-slate">
+      {label}
+    </span>
+
+    <!-- The dotted leader. Decorative, so hidden from assistive technology. -->
+    <span class="min-w-6 flex-1 translate-y-[-0.2em] border-b border-dotted border-ink/25" aria-hidden="true"
+    ></span>
+
+    {
+      pending ? (
+        <span class="font-mono text-sm text-slate">{value}</span>
+      ) : (
+        <span
+          class:list={[
+            'font-mono leading-none text-ink',
+            emphasis ? 'text-3xl sm:text-4xl' : 'text-2xl sm:text-[1.75rem]',
+          ]}
+        >
+          {value}
+        </span>
+      )
+    }
+  </div>
+
+  {
+    (asOf || note) && (
+      <div class="mt-1.5 flex items-baseline justify-between gap-4">
+        <span class="text-[0.8125rem] leading-snug text-slate">{note}</span>
+        {asOf && (
+          <span class="shrink-0 font-mono text-[0.6875rem] tracking-[0.06em] text-slate">
+            {asOf}
+          </span>
+        )}
+      </div>
+    )
+  }
+</div>

@@ -1,0 +1,39 @@
+---
+/**
+ * A call-to-action link styled as a button.
+ *
+ * Renders an <a>, not a <button>, because every action on this site is
+ * navigation. Keep the radius minimal — the soft-rounded SaaS look is exactly
+ * the register this design avoids.
+ */
+interface Props {
+  href: string;
+  /** `solid` for the single primary action on a page; `outline` for the rest. */
+  variant?: 'solid' | 'outline' | 'onDark';
+  /** Opens in a new tab and appends a screen-reader note saying so. */
+  external?: boolean;
+  class?: string;
+}
+
+const { href, variant = 'solid', external = false, class: className = '' } = Astro.props;
+
+const base =
+  'inline-flex items-center justify-center gap-2 rounded-xs px-6 py-3.5 font-mono text-[0.75rem] uppercase tracking-[0.12em] transition-colors';
+
+const variants = {
+  solid: 'bg-ink text-paper hover:bg-royal',
+  outline: 'border border-ink/25 text-ink hover:border-royal hover:text-royal',
+  onDark: 'border border-paper/35 text-paper hover:border-gold hover:text-gold',
+} as const;
+---
+
+<a
+  href={href}
+  class:list={[base, variants[variant], className]}
+  target={external ? '_blank' : undefined}
+  rel={external ? 'noopener noreferrer' : undefined}
+>
+  <slot />
+  {external && <span aria-hidden="true">↗</span>}
+  {external && <span class="sr-only">(opens in a new tab)</span>}
+</a>

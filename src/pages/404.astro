@@ -1,0 +1,36 @@
+---
+/**
+ * 404. Kept short and useful — a dead end is a trust leak.
+ * `noindex` keeps it out of search results.
+ */
+import Base from '../layouts/Base.astro';
+import CTAButton from '../components/CTAButton.astro';
+import { liveNavItems } from '../lib/nav';
+
+const items = liveNavItems();
+---
+
+<Base title="Page not found" description="That page does not exist." noindex>
+  <section class="mx-auto max-w-3xl px-5 py-24 sm:px-8 sm:py-32">
+    <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-slate">Error 404</p>
+
+    <h1 class="mt-5 text-4xl leading-tight sm:text-5xl">That page does not exist</h1>
+
+    <div class="mt-8 h-px w-24 bg-gold" aria-hidden="true"></div>
+
+    <p class="mt-8 text-lg leading-relaxed text-slate">
+      The link may be out of date, or the address may have a typo in it.
+    </p>
+
+    <div class="mt-10 flex flex-wrap gap-3">
+      <CTAButton href="/">Back to the home page</CTAButton>
+      {
+        items.map((item) => (
+          <CTAButton href={item.href} variant="outline">
+            {item.label}
+          </CTAButton>
+        ))
+      }
+    </div>
+  </section>
+</Base>

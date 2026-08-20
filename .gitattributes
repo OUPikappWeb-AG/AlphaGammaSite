@@ -1,0 +1,17 @@
+# Normalise line endings to LF in the repository.
+#
+# This matters more than it looks. The handoff plan depends on officers editing
+# files directly on github.com, and the web editor always writes LF. Without
+# this, edits made on Windows and edits made in the browser fight each other
+# and produce diffs where every line appears changed.
+* text=auto eol=lf
+
+# Binary assets — never touch these.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.avif binary
+*.woff binary
+*.woff2 binary
+*.ico binary

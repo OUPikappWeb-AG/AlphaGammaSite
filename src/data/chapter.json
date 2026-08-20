@@ -1,0 +1,64 @@
+{
+  "lastReviewed": "2026-08-18",
+
+  "identity": {
+    "chapterName": "Alpha Gamma",
+    "school": "University of Oklahoma",
+    "founded": "TODO",
+    "nationalFounded": "1904"
+  },
+
+  "links": {
+    "memberPortal": "https://chapterlink.app/signin",
+    "national": "https://pikapp.org",
+    "abilityExperience": "https://abilityexperience.org",
+    "instagram": "TODO"
+  },
+
+  "contact": {
+    "recruitmentChair": {
+      "name": "TODO",
+      "email": "recruitment@oupikapp.com",
+      "phone": "TODO"
+    },
+    "chapterEmail": "TODO",
+    "houseAddress": "TODO"
+  },
+
+  "academics": {
+    "chapterGPA":       { "value": null, "asOf": "TODO", "source": "OU Fraternity & Sorority Programs report" },
+    "allMensAverage":   { "value": null, "asOf": "TODO", "source": "OU Fraternity & Sorority Programs report" },
+    "allFraternityAvg": { "value": null, "asOf": "TODO", "source": "OU Fraternity & Sorority Programs report" },
+    "retentionRate":    { "value": null, "asOf": "TODO", "source": "Chapter records" },
+    "gradRate":         { "value": null, "asOf": "TODO", "source": "Chapter records" }
+  },
+
+  "service": {
+    "hoursPerYear":   { "value": null, "asOf": "TODO", "source": "Chapter service log" },
+    "hoursPerMember": { "value": null, "asOf": "TODO", "source": "Chapter service log" }
+  },
+
+  "abilityExperience": {
+    "raisedThisYear":      { "value": null, "asOf": "TODO", "source": "Chapter treasurer" },
+    "raisedAllTime":       { "value": null, "asOf": "TODO", "source": "Chapter treasurer" },
+    "journeyOfHopeRiders": { "value": null, "asOf": "TODO", "source": "Chapter records" }
+  },
+
+  "membership": {
+    "activeMembers":   { "value": null, "asOf": "TODO", "source": "Chapter roster" },
+    "pledgeClassSize": { "value": null, "asOf": "TODO", "source": "Chapter roster" }
+  },
+
+  "dues": {
+    "newMemberSemester": { "value": null, "asOf": "TODO", "source": "Chapter treasurer" },
+    "activeSemester":    { "value": null, "asOf": "TODO", "source": "Chapter treasurer" },
+    "includes": ["TODO"],
+    "paymentPlansAvailable": true,
+    "notes": "TODO"
+  },
+
+  "alumniOutcomes": {
+    "companies": ["TODO"],
+    "gradSchools": ["TODO"]
+  }
+}

@@ -1,0 +1,136 @@
+---
+/**
+ * The page shell: metadata, fonts, navigation, footer.
+ *
+ * Every page wraps its content in this layout and passes a unique `title` and
+ * `description`. Those two props are what a search result and a text-message
+ * link preview are built from, so they are required, not optional.
+ */
+import '../styles/global.css';
+import newsreaderLatin from '@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url';
+
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { chapter, isTodo } from '../lib/chapter';
+import { canonicalUrl } from '../lib/url';
+
+interface Props {
+  /** Page-specific title. The site name is appended automatically. */
+  title: string;
+  /** One or two plain sentences. Shown in search results and link previews. */
+  description: string;
+  /** Absolute path to a social preview image. Defaults to the site-wide card. */
+  ogImage?: string;
+  /** Set on pages that should stay out of search results, e.g. 404. */
+  noindex?: boolean;
+}
+
+const { title, description, ogImage = '/og-default.png', noindex = false } = Astro.props;
+
+const siteName = 'Pi Kappa Phi at OU';
+const fullTitle = `${title} · ${siteName}`;
+
+const canonical = canonicalUrl(Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL(ogImage, Astro.site).href;
+
+/**
+ * Structured data. Search engines use this to understand what organization
+ * the site belongs to. Placeholder values are filtered out rather than
+ * published as the literal string "TODO".
+ */
+const sameAs = [chapter.links.national, chapter.links.abilityExperience];
+if (!isTodo(chapter.links.instagram)) sameAs.push(chapter.links.instagram);
+
+const jsonLd: Record<string, unknown> = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: `${chapter.identity.chapterName} Chapter of Pi Kappa Phi`,
+  alternateName: `Pi Kappa Phi at the ${chapter.identity.school}`,
+  url: Astro.site?.href,
+  logo: new URL('/favicon.svg', Astro.site).href,
+  foundingDate: isTodo(chapter.identity.founded) ? undefined : chapter.identity.founded,
+  parentOrganization: {
+    '@type': 'Organization',
+    name: 'Pi Kappa Phi Fraternity',
+    url: chapter.links.national,
+  },
+  sameAs,
+};
+
+if (!isTodo(chapter.contact.houseAddress)) {
+  jsonLd.address = {
+    '@type': 'PostalAddress',
+    streetAddress: chapter.contact.houseAddress,
+    addressLocality: 'Norman',
+    addressRegion: 'OK',
+    addressCountry: 'US',
+  };
+}
+---
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+
+    <!--
+      Preload the display face. It renders the chapter name above the fold, so
+      fetching it early removes a visible flash of fallback serif.
+    -->
+    <link rel="preload" href={newsreaderLatin} as="font" type="font/woff2" crossorigin />
+
+    <!-- Open Graph — this is what renders when the link is texted or posted. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#0E1626" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!--
+      Swap the .no-js class before first paint. Anything that would otherwise
+      be hidden by a scroll-reveal stays visible if this never runs.
+    -->
+    <script is:inline>
+      document.documentElement.classList.remove('no-js');
+    </script>
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+
+  <body class="flex min-h-screen flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-ink focus:px-4 focus:py-3 focus:text-paper focus:no-underline"
+    >
+      Skip to content
+    </a>
+
+    <Nav />
+
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>
