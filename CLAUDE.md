@@ -146,7 +146,7 @@ Recorded so a future session doesn't silently undo them.
 |---|---|
 | **Netlify, not Vercel and not Cloudflare Pages** | Netlify is free, keeps push-to-deploy, and — unlike Cloudflare Pages — attaches an apex domain while DNS stays **external**. The owner explicitly does not want to move nameservers off GoDaddy. |
 | **Nameservers stay at GoDaddy** | Cloudflare Pages requires the domain to be a Cloudflare zone before it will serve an apex custom domain. That means recreating every DNS record including MX, which spec §8 flags in red. Netlify takes a plain A record instead, so the GoDaddy zone gets edited, never rebuilt. |
-| Repo stays **private on the personal account** for now | The owner's call, 2026-08-21. See the 🔴 landmine under Deployment status — this decision has a delayed cost, not a zero cost. |
+| **Repo goes public** | Forced by the above: the repo is already Org-owned and private, and Netlify puts private Org repos behind Pro ($20/mo). Public is free, immediate, and costs nothing real — the repo contains no keys, no database, and only data the site already publishes. Owner's call, 2026-08-21. |
 | `pretty_urls = false` in `netlify.toml` | Netlify's default would 301 `/join` → `/join/`, pointing every canonical tag at a redirect. See Gotchas. |
 | Long-cache headers on `/_astro/*` | Filenames are content-hashed, so a changed file is a changed URL and these are safe to cache forever. That path is most of the first-paint payload — ~97 KB of it fonts. |
 | **No Content-Security-Policy** | The nav toggle and scroll reveal are inline scripts, and a static site cannot issue per-request nonces. Any CSP strict enough to be worth having would break them. Revisit only if those inline scripts go. |
@@ -178,10 +178,17 @@ so this setting is the only lever there is.
 
 Hosting is decided (Netlify — see Decisions). What is left, in order:
 
+0. 🔴 **Make the repo public** — `OUPikappWeb-AG/AlphaGammaSite` → Settings →
+   Danger Zone → Change visibility. **Netlify free cannot build a private
+   Org-owned repo**, so nothing below this works until it is done. Owner-only
+   step; needs Org owner rights.
+0b. **Update the local remote** if it still says `oupikappweb`:
+   `git remote set-url origin https://github.com/OUPikappWeb-AG/AlphaGammaSite.git`
 1. **Connect the repo to Netlify.** Owner-only step: it needs a Netlify login and
-   the Netlify GitHub App installed on `oupikappweb`. `netlify.toml` already
-   carries the build settings, so accept whatever Netlify auto-detects — do not
-   retype the build command into the UI, where it would silently take priority.
+   the Netlify GitHub App installed on the **`OUPikappWeb-AG` Org** (an Org owner
+   must install it, or approve a member's request). `netlify.toml` already carries
+   the build settings, so accept whatever Netlify auto-detects — do not retype the
+   build command into the dashboard, where a UI value would silently win.
 2. **Confirm the site builds on Netlify's Linux runner**, not just on the owner's
    Windows machine. Watch for the Node version: `netlify.toml` pins 24.
 3. **Wire in the real numbers.** The owner holds GPA, service hours, Ability
@@ -242,7 +249,11 @@ Measured at end of session:
 
 ## Git status — read before touching version control
 
-**History now exists and is pushed** (2026-08-20). `main` tracks `origin/main`; 32 files tracked; working tree clean.
+**History exists and is pushed.** `main` tracks `origin/main`.
+
+⚠️ **The repo now lives at `OUPikappWeb-AG/AlphaGammaSite`** (Organization), not
+under `oupikappweb`. See the transfer note below — and do not trust `git remote -v`
+to tell you this.
 
 ```
 43e7299  Document push access decision and the misleading private-repo 404
@@ -264,7 +275,32 @@ Measured at end of session:
   - This is a known, accepted deviation from `BUILD-SPEC.md` §7, which wants everything chapter-owned. Revisit at officer turnover: if `Nswchoeffler` loses access, pushes break.
   - Symptom to recognise: GitHub returns **"Repository not found"** for a private repo on *any* auth failure — unauthenticated, wrong account, or an unaccepted collaborator invite. It almost never means the repo is actually missing.
 
-### 🔴 `oupikappweb` is a User account, not an Organization
+### ✅ The Org transfer HAS happened (discovered 2026-08-21)
+
+**`OUPikappWeb-AG` is a real Organization and `AlphaGammaSite` now lives inside
+it.** This was discovered by accident: a `git push` succeeded but printed
+
+```
+remote: This repository moved. Please use the new location:
+remote:   https://github.com/OUPikappWeb-AG/AlphaGammaSite.git
+```
+
+Verified: `curl -s https://api.github.com/users/OUPikappWeb-AG` returns
+`"type": "Organization"`, and the repo 404s unauthenticated, i.e. still private.
+
+**The lesson: `git remote -v` is not evidence of where a repo lives.** GitHub
+redirects the old URL indefinitely, so a stale remote keeps working silently and
+every conclusion drawn from it is wrong. Two sessions of planning assumed a
+personal-account repo on that basis. Check the API or the push output, not the
+remote.
+
+⚠️ **The local remote may still point at `oupikappweb`.** Update it:
+
+```bash
+git remote set-url origin https://github.com/OUPikappWeb-AG/AlphaGammaSite.git
+```
+
+#### Historical: why the User-vs-Organization distinction mattered
 
 `BUILD-SPEC.md` §7 states the chapter **Organization** is "already created ✓". **That is factually wrong.** Verified 2026-08-20:
 
@@ -278,14 +314,15 @@ This is not pedantry — it changes what is possible:
 - On a **personal** repo, collaborators get push access only. There is no Admin role to grant; that dropdown exists only on Organization repos.
 - **Git integrations need admin rights** on the repo — they install a webhook and a deploy key. So `Nswchoeffler` can push, but cannot connect this repo to a host. Now that the host is **Netlify**, the practical form of this is: the Netlify GitHub App has to be installed by `oupikappweb` (on a personal repo, only the owner can); on an Org repo an Org owner installs it, or a member requests it and an owner approves.
 
-The owner has since created a separate GitHub Org and added `Nswchoeffler` to it as admin. **The repo had not been transferred into that Org as of the end of the session** — the remote still points at `oupikappweb`. Confirm before assuming.
+The owner created the Org (`OUPikappWeb-AG`), added `Nswchoeffler` to it as admin,
+**and completed the transfer** — see above. Spec §7's "chapter Organization" box is
+now genuinely ticked for GitHub.
 
-Two things that block the transfer if overlooked:
+Kept for reference, since a future repo may need the same move:
 
-1. The transfer must be initiated by the repo's owner — signed in as `oupikappweb`, repo → Settings → Danger Zone → Transfer ownership.
-2. `oupikappweb` must be a member of the destination Org with permission to create repos there, or the Org will not appear as a valid destination. It can be removed afterward; the repo stays.
-
-After any transfer, update the local remote — GitHub redirects the old URL, but a stale remote pointing at a personal account will mislead the next officer.
+1. The transfer must be initiated by the repo's owner — repo → Settings → Danger Zone → Transfer ownership.
+2. The initiating account must be a member of the destination Org with permission to create repos there, or the Org will not appear as a valid destination. It can be removed afterward; the repo stays.
+3. Afterwards, update the local remote. GitHub redirects the old URL forever, so nothing visibly breaks — which is exactly why it misleads.
 
 ---
 
@@ -321,9 +358,9 @@ just priced differently.
 
 | Path | Free? | Push-to-deploy? | Chapter-owned? | Blocker |
 |---|---|---|---|---|
-| **Netlify + private repo on personal acct** ← chosen | ✅ | ✅ | ❌ *(for now)* | Breaks on Org transfer |
-| Netlify + **public** Org repo | ✅ | ✅ | ✅ | Repo must be public |
-| Netlify + private Org repo | ~$19/mo | ✅ | ✅ | Money |
+| **Netlify + public Org repo** ← chosen | ✅ | ✅ | ✅ | Repo must be public |
+| Netlify + private Org repo | $20/mo (Pro) | ✅ | ✅ | Money — and at $20 Vercel Pro is the better buy |
+| Netlify + private repo on personal acct | ✅ | ✅ | ❌ | Gives up chapter ownership |
 | Cloudflare Pages + Org repo | ✅ | ✅ | ✅ | Apex domain forces nameservers to Cloudflare |
 | Vercel Pro + Org | ~$20/mo | ✅ | ✅ | Money |
 | Deploy from Vercel CLI | ✅ | ❌ | ✅ | Kills the handoff model |
@@ -343,32 +380,45 @@ plain A record with DNS left at GoDaddy, which is the whole reason it won.
 - **A Vercel Team is created *under* an existing account** — it is not a second signup. The owner was blocked trying to register a second Vercel account (phone verification, only one phone number). That was the wrong approach entirely; two Vercel accounts cannot share an email.
 - **Projects transfer between Vercel teams** (`POST /projects/{id}/transfer-request`, then accept).
 
-### 🔴 The landmine this decision leaves behind
+### 🔴 The repo must be PUBLIC for Netlify to build it
 
-The repo is **private and on the `oupikappweb` personal account**, which Netlify's
-free tier supports. **Organization-owned private repos, it does not.** So the day
-someone transfers this repo into the chapter GitHub Org — the transfer spec §7
-asks for, and which is still on the to-do list — **Netlify builds will start
-failing.**
+Netlify's pricing page lists **"Private organization repos" as a Pro feature —
+$20/mo.** Free and Personal ($9) do not include it. The repo is Org-owned and
+private, so **Netlify free cannot build it as things stand.**
 
-The owner accepted this knowingly on 2026-08-21 in exchange for shipping now.
-Whoever does that transfer must do one of these *at the same time*:
+**Decision (owner, 2026-08-21): make the repo public.** It is free, immediate,
+keeps DNS at GoDaddy, and keeps the repo chapter-owned in the Org. Nothing in the
+repo is secret — `chapter.json` holds only data the site already publishes to
+visitors, there are no keys, no tokens, no database.
 
-- **Make the repo public** (nothing in it is secret — `chapter.json` holds only
-  data the site already publishes, there are no keys and no database), or
-- **Pay for Netlify's paid tier** (~$19/mo), or
-- **Move to Cloudflare Pages** and accept the nameserver migration.
+⚠️ **Do not make this repo private again** without also changing hosts or paying.
+It will look like the site simply stopped updating. Netlify reports the failure as
+a build/permission error, **not** as "your plan does not cover this" — so it is
+very easy to burn hours debugging it as a build problem.
 
-The failure will not be self-explanatory. Netlify reports it as a build/permission
-error, not as "your plan does not cover this." **Do not debug it as a build
-problem.**
+Why the alternatives lost:
+
+- **Netlify Pro / Vercel Pro (~$20/mo).** At that price Netlify has no advantage
+  left over Vercel — the only reason Netlify won was being free. If the chapter
+  ever does fund hosting, reopen the comparison rather than defaulting to Netlify.
+- **Cloudflare Pages.** Free *and* handles private Org repos — the only option
+  that does both — but its apex-domain requirement forces the nameserver move the
+  owner declined.
+- **Moving the repo back to a personal account.** Undoes the chapter ownership
+  that spec §7 calls the single most common way a chapter website dies.
 
 ### Where this session stopped
 
 `netlify.toml` is written, committed and pushed. The build is verified clean
 locally (0 errors / 0 warnings / 0 hints, 3 pages, 0 `.js` files, 0 `TODO`s in
-`dist/`). No Netlify account has been connected yet — that step needs the owner,
-because it opens a browser and installs the Netlify GitHub App.
+`dist/`).
+
+**Two owner-only steps remain before anything can deploy**, both requiring a
+browser and Org owner rights:
+
+1. Flip the repo to **public**.
+2. Create the Netlify account, install its GitHub App on `OUPikappWeb-AG`, and
+   import the repo.
 
 **Netlify CLI is not installed and is not needed.** Use the Git integration, not
 `netlify deploy` — a CLI deploy has the same defect as the Vercel CLI path: it
@@ -411,7 +461,7 @@ Order to follow: **deploy to a `*.netlify.app` URL → wire in the real numbers 
 2. ~~**The remote may not exist.**~~ Resolved 2026-08-20 — it exists and is private. Note that `gh` CLI is still not installed on this machine, so pushing relies on Git Credential Manager.
 3. **Account ownership (spec §7) — partially resolved, still the biggest risk.**
    - Domain: GoDaddy, owner controls DNS. **Whose account and whose card is still unconfirmed.** Ask.
-   - GitHub: an Org now exists with `Nswchoeffler` as admin, but the repo may still sit under the `oupikappweb` User account. Confirm, don't assume.
+   - ~~GitHub.~~ **Resolved 2026-08-21.** The repo is in the `OUPikappWeb-AG` Organization with `Nswchoeffler` as admin. Spec §7's GitHub row is genuinely satisfied.
    - Hosting: **Netlify**, decided 2026-08-21, but the account is not created yet and will start out personal. The Vercel hobby account remains in play only for ChapterLink.
    - Email alias: unconfirmed.
    - The two-admin rule is met nowhere yet.
