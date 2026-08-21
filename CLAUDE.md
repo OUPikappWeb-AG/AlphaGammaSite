@@ -162,6 +162,26 @@ Setting `build.format: 'file'` caused two bugs at once: canonical tags published
 
 **Inline scripts in `<head>`** need an explicit `is:inline` directive when they carry attributes, or `astro check` emits a hint.
 
+**Netlify injects a 33.7 KB script unless you stop it.** The "Netlify Drawer"
+(heads-up display) is added *post-build*, so `npm run build` still reports zero
+`.js` files while the live page loads
+`/.netlify/scripts/hud?variant=public` — 33,737 bytes against a ~142 KB
+first-paint budget, a 23% increase, and a straight violation of hard rule 8.
+Disable at **Project configuration → Build & deploy → Continuous deployment →
+Collaboration tools → Configure → Netlify Drawer**. There is no `netlify.toml`
+key for it, so this one *is* a dashboard setting — re-check it if the site is
+ever recreated.
+
+**Netlify overrides the HSTS header on `*.netlify.app`.** `netlify.toml` sets
+`Strict-Transport-Security: max-age=31536000` with no `includeSubDomains`,
+deliberately, because `app.oupikapp.com` is reserved for ChapterLink. The
+netlify.app host serves `max-age=31536000; includeSubDomains; preload` regardless
+— that domain is on the HSTS preload list, so Netlify has to. Every *other*
+custom header applied verbatim, so this is specific to their domain. 🔴 **Re-verify
+on `oupikapp.com` once DNS is pointed.** If `includeSubDomains` is forced there
+too, it silently commits `app.oupikapp.com` to HTTPS-only before ChapterLink
+exists.
+
 **Netlify "Pretty URLs" fights `trailingSlash: 'never'`.** It is ON by default.
 Astro's directory output emits `dist/join/index.html`, and Pretty URLs turns
 that into a 301 from `/join` to `/join/` — while the canonical tag and the
@@ -178,26 +198,20 @@ so this setting is the only lever there is.
 
 Hosting is decided (Netlify — see Decisions). What is left, in order:
 
-0. 🔴 **Make the repo public** — `OUPikappWeb-AG/AlphaGammaSite` → Settings →
-   Danger Zone → Change visibility. **Netlify free cannot build a private
-   Org-owned repo**, so nothing below this works until it is done. Owner-only
-   step; needs Org owner rights.
-0b. **Update the local remote** if it still says `oupikappweb`:
+1. **Update the local remote** if it still says `oupikappweb` — GitHub redirects,
+   so a stale remote works silently and misleads:
    `git remote set-url origin https://github.com/OUPikappWeb-AG/AlphaGammaSite.git`
-1. **Connect the repo to Netlify.** Owner-only step: it needs a Netlify login and
-   the Netlify GitHub App installed on the **`OUPikappWeb-AG` Org** (an Org owner
-   must install it, or approve a member's request). `netlify.toml` already carries
-   the build settings, so accept whatever Netlify auto-detects — do not retype the
-   build command into the dashboard, where a UI value would silently win.
-2. **Confirm the site builds on Netlify's Linux runner**, not just on the owner's
-   Windows machine. Watch for the Node version: `netlify.toml` pins 24.
+2. **Disable the Netlify Drawer** — Project configuration → Build & deploy →
+   Continuous deployment → Collaboration tools. It injects 33.7 KB of JS and
+   breaks hard rule 8. Dashboard-only; no `netlify.toml` equivalent.
 3. **Wire in the real numbers.** The owner holds GPA, service hours, Ability
    Experience dollars, and photos. Single highest-leverage change on the site and
    it needs no new code — only `chapter.json`, plus each figure's `asOf` and
    `source`.
 4. **Then** point `oupikapp.com` (spec §8: copy the exact records **Netlify**
    shows, never IPs from a doc — including this one — and do not touch MX
-   records).
+   records). Immediately afterwards, re-check the HSTS header for a forced
+   `includeSubDomains`, which would affect `app.oupikapp.com`.
 5. Then Phase 2 — `/parents` and `/ability-experience`. The owner must write the
    anti-hazing paragraph themselves; do not draft it for them.
 
@@ -212,8 +226,10 @@ Both phases' gates in `BUILD-SPEC.md` §10 are about *shipping*, not about code:
 - Phase 0 gate — "Site resolves at `oupikapp.com` over HTTPS" — **not met.**
 - Phase 1 gate — "Shippable. Push it live." — **not met.**
 
-Hosting is now **decided — Netlify** (2026-08-21), and `netlify.toml` is in the
-repo, but **no Netlify account has been connected**, so nothing is serving yet.
+**The site is deployed and serving** at
+`https://musical-zabaione-49f618.netlify.app` (2026-08-21). Phase 1's "shippable"
+gate is met in substance; Phase 0's gate is not, because it names `oupikapp.com`
+specifically and DNS is still unpointed.
 
 Re-verified 2026-08-21 against the Vercel account, unchanged: one team
 (`nwschprojects-7699's projects`, a personal hobby account) holding one project
@@ -326,7 +342,7 @@ Kept for reference, since a future repo may need the same move:
 
 ---
 
-## Deployment status — decided, not yet live (verified 2026-08-21)
+## Deployment status — live on netlify.app, domain not yet pointed (2026-08-21)
 
 `oupikapp.com` **is registered at GoDaddy and the owner controls DNS.** It has
 never been pointed anywhere. **DNS stays at GoDaddy** — that constraint is what
@@ -407,18 +423,44 @@ Why the alternatives lost:
 - **Moving the repo back to a personal account.** Undoes the chapter ownership
   that spec §7 calls the single most common way a chapter website dies.
 
+### ✅ Verified live on Netlify (2026-08-21)
+
+First deploy succeeded on Netlify's Linux runner — the build is now proven off the
+owner's Windows machine. Checked against the live host, not the local `dist/`:
+
+| Check | Result |
+|---|---|
+| `/join` returns 200, **not** a 301 to `/join/` | ✅ `pretty_urls = false` worked |
+| Canonicals point at `https://oupikapp.com/...` | ✅ not the netlify.app host |
+| Unknown path serves the 404 page | ✅ |
+| `TODO` strings in delivered HTML | ✅ 0 on every page |
+| Dev-only `PendingFields` banner | ✅ absent from production |
+| `<h1>` per page | ✅ exactly 1 |
+| `aria-current="page"` on `/join` | ✅ present |
+| `/_astro/*` cache header | ✅ `public,max-age=31536000,immutable` |
+| `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` | ✅ served as configured |
+| Zero client-side JS | ❌ **Netlify injects a 33.7 KB HUD script** — see Gotchas |
+| HSTS as configured | ⚠️ **overridden on netlify.app** — see Gotchas |
+
+One more Netlify default worth knowing: **new sites start behind "Visitor access"
+protection** and return `401` with a redirect to `app.netlify.com/edge-access` for
+everyone, including you in a logged-out browser. It is not a build failure and
+nothing in `netlify.toml` causes it. Site configuration → Access & security →
+**Visitor access**. (There is no separate "Site protection" item despite what
+older docs say.)
+
 ### Where this session stopped
 
 `netlify.toml` is written, committed and pushed. The build is verified clean
 locally (0 errors / 0 warnings / 0 hints, 3 pages, 0 `.js` files, 0 `TODO`s in
 `dist/`).
 
-**Two owner-only steps remain before anything can deploy**, both requiring a
-browser and Org owner rights:
+Done this session: repo made public, Netlify connected, first deploy green,
+live output verified. Outstanding, in order:
 
-1. Flip the repo to **public**.
-2. Create the Netlify account, install its GitHub App on `OUPikappWeb-AG`, and
-   import the repo.
+1. **Disable the Netlify Drawer** (dashboard) — restores the zero-JS guarantee.
+2. **Wire the real numbers into `chapter.json`.** Blocks pointing the domain.
+3. **Point `oupikapp.com`**, then immediately re-check the HSTS header.
 
 **Netlify CLI is not installed and is not needed.** Use the Git integration, not
 `netlify deploy` — a CLI deploy has the same defect as the Vercel CLI path: it
