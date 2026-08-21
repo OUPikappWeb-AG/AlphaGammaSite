@@ -22,6 +22,8 @@ export interface NavItem {
 
 export const navItems: readonly NavItem[] = [
   { label: 'About', href: '/about', ready: false },
+  { label: 'History', href: '/history', ready: true },
+  { label: 'Housing', href: '/housing', ready: true },
   { label: 'Ability Experience', href: '/ability-experience', ready: false },
   { label: 'For Parents', href: '/parents', ready: false },
   { label: 'Join', href: '/join', ready: true },

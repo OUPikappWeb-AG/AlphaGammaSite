@@ -1,0 +1,58 @@
+---
+/**
+ * A vertical timeline of chapter milestones.
+ *
+ * DESIGN NOTES
+ * ------------
+ * - The spine is a gold hairline. That is precisely what gold is for in this
+ *   system: rules and accents, never body text. The years beside it use
+ *   `gold-text`, the darkened variant that actually passes contrast on paper.
+ * - Years are set in mono, like every other figure on the site. That is the
+ *   signature move — it makes a date read as recorded rather than recalled.
+ * - No animation. Hard rule: motion is spent on the Chapter Record reveal and
+ *   nowhere else, so this renders finished.
+ * - No client-side JavaScript. It is an ordered list and a border.
+ *
+ * The <ol> is semantically right: these events have a meaningful sequence,
+ * and a screen reader announces the count, which tells a listener how much
+ * history there is before they have read any of it.
+ */
+import PhotoBand from './PhotoBand.astro';
+import type { Milestone } from '../data/history.schema';
+
+interface Props {
+  /** Already sorted by the caller. See src/lib/history.ts. */
+  milestones: Milestone[];
+}
+
+const { milestones } = Astro.props;
+---
+
+<ol class="max-w-3xl">
+  {
+    milestones.map((m) => (
+      <li class="relative border-l border-gold/40 pb-12 pl-6 last:pb-0 sm:pl-8">
+        {/*
+          The marker sits on the spine. aria-hidden because the list structure
+          already conveys sequence — announcing a bullet adds nothing.
+        */}
+        <span
+          class="absolute -left-[4px] top-[0.5rem] h-[7px] w-[7px] rounded-full bg-gold"
+          aria-hidden="true"
+        />
+
+        <p class="font-mono text-[0.8125rem] uppercase tracking-[0.14em] text-gold-text">
+          {m.year}
+        </p>
+
+        <h3 class="mt-2 text-xl leading-snug sm:text-2xl">{m.title}</h3>
+
+        <p class="mt-3 text-base leading-relaxed text-slate">{m.body}</p>
+
+        {m.photo && m.photoAlt && (
+          <PhotoBand src={m.photo} alt={m.photoAlt} class="mt-6" />
+        )}
+      </li>
+    ))
+  }
+</ol>

@@ -83,6 +83,12 @@ export const chapterSchema = z.object({
     memberPortal: z.url(),
     national: z.url(),
     abilityExperience: z.url(),
+    /**
+     * Pi Kappa Phi Properties — the fraternity's housing arm. Linked from
+     * /housing so a parent can verify who actually manages the building
+     * rather than taking the chapter's word for it.
+     */
+    properties: z.url(),
     /** Full URL to the chapter Instagram, or "TODO" until one exists. */
     instagram: z.union([z.url(), z.literal('TODO')]),
   }),

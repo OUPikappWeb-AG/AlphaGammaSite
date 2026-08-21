@@ -1,0 +1,116 @@
+---
+/**
+ * /history — the Alpha Gamma chapter timeline.
+ *
+ * WHAT THIS PAGE IS FOR
+ * ---------------------
+ * Longevity is evidence. A parent who has just learned their son is rushing
+ * has no way to judge whether this is a serious institution or four guys and
+ * a lease. A chapter that has been on the same campus for a century is
+ * self-evidently the former, and unlike almost everything else a fraternity
+ * might claim about itself, it is a matter of public record.
+ *
+ * WHY THE HEADLINE NUMBER IS NOT WRITTEN ANYWHERE
+ * ----------------------------------------------
+ * "Over 100 years at OU" is derived from `identity.founded` via
+ * `yearsOnCampus()`. It is never typed, so it can never go stale, and it is
+ * simply not shown while the charter year is still TODO. Hard rule 1: an
+ * unverified date does not get guessed at, least of all the one doing the
+ * most persuading.
+ */
+import Base from '../layouts/Base.astro';
+import Timeline from '../components/Timeline.astro';
+import CTAButton from '../components/CTAButton.astro';
+import { chapter, yearsOnCampus, foundedYear } from '../lib/chapter';
+import { milestones, hasMilestones } from '../lib/history';
+
+const years = yearsOnCampus();
+const founded = foundedYear();
+const entries = milestones();
+---
+
+<Base
+  title="History"
+  description="Example description. The history of the Alpha Gamma Chapter of Pi Kappa Phi at the University of Oklahoma."
+>
+  <!-- ── Header ────────────────────────────────────────────────────── -->
+  <section class="mx-auto max-w-6xl px-5 pb-14 pt-16 sm:px-8 sm:pt-24">
+    <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-slate">History</p>
+
+    <h1 class="mt-5 max-w-3xl text-[2.5rem] leading-[1.08] sm:text-5xl">
+      Alpha Gamma at the University of Oklahoma
+    </h1>
+
+    <div class="mt-8 h-px w-24 bg-gold" aria-hidden="true"></div>
+
+    <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate">
+      Example paragraph. One or two sentences on what has stayed the same about this chapter
+      across its time on campus, written plainly and without superlatives.
+    </p>
+  </section>
+
+  <!--
+    ── The longevity figure ───────────────────────────────────────────
+    Rendered only when the charter year is known. While `founded` is TODO
+    this whole band is omitted rather than shown empty, because a hedged
+    version of this claim is worth less than no claim at all.
+  -->
+  {
+    years !== null && founded !== null && (
+      <section aria-labelledby="longevity" class="border-y-2 border-gold bg-ink text-paper">
+        <div class="mx-auto grid max-w-6xl gap-8 px-5 py-14 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-baseline sm:gap-14 sm:px-8 sm:py-16">
+          <p class="font-mono text-6xl leading-none text-gold sm:text-7xl">{years}</p>
+
+          <div>
+            <h2 id="longevity" class="text-2xl leading-snug sm:text-3xl">
+              years at the University of Oklahoma
+            </h2>
+            <p class="mt-3 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-paper/70">
+              Chartered {founded} · Pi Kappa Phi founded {chapter.identity.nationalFounded}
+            </p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- ── Timeline ──────────────────────────────────────────────────── -->
+  {
+    hasMilestones() && (
+      <section aria-labelledby="timeline" class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+        <h2 id="timeline" class="text-2xl leading-snug sm:text-3xl">
+          Milestones
+        </h2>
+
+        <div class="mt-10">
+          <Timeline milestones={entries} />
+        </div>
+      </section>
+    )
+  }
+
+  <!-- ── National context ──────────────────────────────────────────── -->
+  <section
+    aria-labelledby="national"
+    class="mx-auto max-w-6xl border-t border-ink/10 px-5 py-16 sm:px-8"
+  >
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+      <div class="max-w-2xl">
+        <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-gold-text">
+          The national fraternity
+        </p>
+        <h2 id="national" class="mt-3 text-2xl leading-snug sm:text-3xl">
+          Pi Kappa Phi was founded in {chapter.identity.nationalFounded}
+        </h2>
+        <p class="mt-4 text-base leading-relaxed text-slate">
+          Example paragraph. A sentence on the national organisation and this chapter's
+          relationship to it, written for someone who has never heard of either.
+        </p>
+      </div>
+
+      <CTAButton href={chapter.links.national} variant="outline" external class="shrink-0">
+        Pi Kappa Phi national
+      </CTAButton>
+    </div>
+  </section>
+</Base>

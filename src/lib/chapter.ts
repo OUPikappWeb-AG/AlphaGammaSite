@@ -91,6 +91,44 @@ export function formatStat(s: Stat, format: StatFormat = 'integer'): string {
   }
 }
 
+/* ------------------------------------------------------------------ *
+ * Derived figures
+ * ------------------------------------------------------------------ */
+
+/**
+ * How many years the chapter has been at OU, derived from
+ * `identity.founded`.
+ *
+ * WHY THIS IS COMPUTED AND NOT WRITTEN DOWN
+ * -----------------------------------------
+ * "On campus for over 100 years" is the single most persuasive line the
+ * history page has, which is exactly why it must never be typed by hand.
+ * Hardcode "100" and it is wrong the following year and nobody notices.
+ * Derived from the charter year, it can only ever be right — and it returns
+ * null while `founded` is still TODO, so the claim is simply not made rather
+ * than guessed.
+ *
+ * Computed at build time. The site is static, so the number refreshes on the
+ * next deploy, which the semester-review workflow will trigger anyway.
+ */
+export function yearsOnCampus(asOf: Date = new Date()): number | null {
+  if (isTodo(chapter.identity.founded)) return null;
+
+  const founded = Number.parseInt(chapter.identity.founded.slice(0, 4), 10);
+  if (!Number.isFinite(founded)) return null;
+
+  const years = asOf.getFullYear() - founded;
+  return years > 0 ? years : null;
+}
+
+/**
+ * The charter year as a plain string, or null while it is still a placeholder.
+ * Kept separate from `yearsOnCampus` so a page can show one without the other.
+ */
+export function foundedYear(): string | null {
+  return isTodo(chapter.identity.founded) ? null : chapter.identity.founded;
+}
+
 /**
  * Render the "as of" stamp that sits under every stat.
  * Returns null while the period is still a placeholder, so the component can

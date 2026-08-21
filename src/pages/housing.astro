@@ -1,0 +1,112 @@
+---
+/**
+ * /housing — the chapter house.
+ *
+ * WHAT THIS PAGE IS FOR
+ * ---------------------
+ * A parent wants to know where their son will actually live, and whether an
+ * adult is responsible for the building. Photographs answer the first
+ * question far better than any paragraph can. The link to Pi Kappa Phi
+ * Properties answers the second, and it answers it *independently* — a parent
+ * can verify it without taking the chapter's word for anything, which is the
+ * whole basis on which this site tries to earn trust.
+ *
+ * ⚠️ Hard rule 5, and it applies here more than anywhere else on the site:
+ * no alcohol visible in any photograph. Check every frame, including
+ * backgrounds, shelves and tables, before adding a file.
+ *
+ * Photographs come from `src/data/housing.json`. Until one is added, the
+ * gallery band is omitted rather than shown empty.
+ */
+import Base from '../layouts/Base.astro';
+import PhotoBand from '../components/PhotoBand.astro';
+import CTAButton from '../components/CTAButton.astro';
+import { chapter, isTodo } from '../lib/chapter';
+import { housePhotos, hasHousePhotos } from '../lib/housing';
+
+const photos = housePhotos();
+const [lead, ...rest] = photos;
+
+const address = chapter.contact.houseAddress;
+const hasAddress = !isTodo(address);
+---
+
+<Base
+  title="Housing"
+  description="Example description. The Pi Kappa Phi chapter house at the University of Oklahoma, and who manages it."
+>
+  <!-- ── Header ────────────────────────────────────────────────────── -->
+  <section class="mx-auto max-w-6xl px-5 pb-12 pt-16 sm:px-8 sm:pt-24">
+    <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-slate">Housing</p>
+
+    <h1 class="mt-5 max-w-3xl text-[2.5rem] leading-[1.08] sm:text-5xl">The chapter house</h1>
+
+    <div class="mt-8 h-px w-24 bg-gold" aria-hidden="true"></div>
+
+    <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate">
+      Example paragraph. Where the house is, who lives there, and what living in it is actually
+      like day to day. Plain and specific.
+    </p>
+
+    {
+      hasAddress && (
+        <p class="mt-6 font-mono text-[0.8125rem] uppercase leading-relaxed tracking-[0.12em] text-slate">
+          {address}
+        </p>
+      )
+    }
+  </section>
+
+  <!--
+    ── Photographs ────────────────────────────────────────────────────
+    The first photo is the one a parent forms their impression from, so it
+    runs full width and loads eagerly. The rest sit in a quiet two-column
+    grid beneath it.
+  -->
+  {
+    hasHousePhotos() && (
+      <section aria-labelledby="photos" class="mx-auto max-w-6xl px-5 pb-4 sm:px-8">
+        <h2 id="photos" class="sr-only">
+          Photographs of the chapter house
+        </h2>
+
+        <PhotoBand src={lead.file} alt={lead.alt} caption={lead.caption} priority />
+
+        {rest.length > 0 && (
+          <div class="mt-6 grid gap-6 sm:grid-cols-2">
+            {rest.map((photo) => (
+              <PhotoBand src={photo.file} alt={photo.alt} caption={photo.caption} />
+            ))}
+          </div>
+        )}
+      </section>
+    )
+  }
+
+  <!-- ── Who manages the building ──────────────────────────────────── -->
+  <section aria-labelledby="properties" class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+    <div class="border border-ink/10 p-6 sm:p-10">
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-12">
+        <div class="max-w-2xl">
+          <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-gold-text">
+            Property management
+          </p>
+
+          <h2 id="properties" class="mt-3 text-2xl leading-snug sm:text-3xl">
+            Pi Kappa Phi Properties
+          </h2>
+
+          <p class="mt-4 text-base leading-relaxed text-slate">
+            Example paragraph. State plainly what Pi Kappa Phi Properties does and what its
+            relationship to this house is. Do not overstate it — a parent can follow the link
+            and check, which is exactly why the link is here.
+          </p>
+        </div>
+
+        <CTAButton href={chapter.links.properties} variant="outline" external class="shrink-0">
+          Visit the site
+        </CTAButton>
+      </div>
+    </div>
+  </section>
+</Base>
