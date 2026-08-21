@@ -1,0 +1,55 @@
+# Netlify deployment configuration for oupikapp.com.
+#
+# Netlify reads this file on every push to `main` and rebuilds the site.
+# Anything set here overrides the equivalent toggle in the Netlify dashboard,
+# which is deliberate: a UI setting is invisible to the next officer, a file in
+# the repo is not.
+
+[build]
+  # `npm run build` is `astro check && astro build`. The typecheck runs first,
+  # so a malformed chapter.json fails the deploy instead of publishing a broken
+  # page to a parent.
+  command = "npm run build"
+  publish = "dist"
+
+  [build.environment]
+    # Must stay in step with .nvmrc. Netlify would read .nvmrc on its own, but
+    # pinning it here keeps the whole deploy environment described in one file.
+    NODE_VERSION = "24"
+
+# ── URL shape ────────────────────────────────────────────────────────────────
+# Netlify's "Pretty URLs" post-processing is ON by default, and with Astro's
+# directory output (dist/join/index.html) it 301-redirects /join to /join/.
+# astro.config.mjs sets `trailingSlash: 'never'` and publishes canonical tags
+# and sitemap entries without the slash, so leaving this on would point every
+# canonical URL at a redirect and split the SEO signal the config exists to
+# keep together. Off.
+[build.processing.html]
+  pretty_urls = false
+
+# ── Caching ──────────────────────────────────────────────────────────────────
+# Everything under /_astro/ has a content hash in its filename, so a changed
+# file is a changed URL and these can be cached permanently. This is most of
+# the first-paint payload — ~97 KB of it is fonts.
+[[headers]]
+  for = "/_astro/*"
+
+  [headers.values]
+    cache-control = "public, max-age=31536000, immutable"
+
+# ── Security headers ─────────────────────────────────────────────────────────
+# No Content-Security-Policy here on purpose: the nav toggle and scroll reveal
+# are inline scripts, and a static site cannot issue per-request nonces, so any
+# CSP strict enough to be worth having would break them.
+[[headers]]
+  for = "/*"
+
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    # No `includeSubDomains`: app.oupikapp.com is reserved for ChapterLink
+    # (BUILD-SPEC.md §8) and this site should not dictate that subdomain's
+    # transport policy. No `preload` either — that is hard to reverse.
+    Strict-Transport-Security = "max-age=31536000"
