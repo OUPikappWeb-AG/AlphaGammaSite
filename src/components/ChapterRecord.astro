@@ -12,28 +12,12 @@
  *
  * To change a number, edit src/data/chapter.json. Never edit it here.
  */
-import { chapter } from '../lib/chapter';
+import { chapter, isPending } from '../lib/chapter';
 import StatLine from './StatLine.astro';
 
 const { academics, service, abilityExperience, membership } = chapter;
 
-/**
- * Sources are collected once and listed at the foot of the band, rather than
- * repeated on every line. Duplicates are collapsed.
- */
-const sources = [
-  ...new Set(
-    [
-      academics.chapterGPA.source,
-      academics.retentionRate.source,
-      service.hoursPerYear.source,
-      abilityExperience.raisedThisYear.source,
-      membership.activeMembers.source,
-    ].filter((s): s is string => Boolean(s)),
-  ),
-];
-
-const columns = [
+const allColumns = [
   {
     heading: 'Academics',
     stats: [
@@ -76,8 +60,51 @@ const columns = [
     ],
   },
 ];
+
+/**
+ * Only figures that have actually been reported are shown.
+ *
+ * WHY THIS FILTERS RATHER THAN LABELLING
+ * --------------------------------------
+ * A line reading "Not yet reported" is honest, and for a *few* gaps it reads
+ * as rigour — the page declining to estimate. Past a certain density it stops
+ * reading that way and starts reading as an empty chapter: four real figures
+ * next to six blanks looks like the chapter has nothing to say, which is the
+ * opposite of what the record exists to do.
+ *
+ * The rows are still declared above and the fields still live in
+ * `chapter.json`, so filling one in is all it takes to bring its line back.
+ * The dev-only PendingFields banner lists everything still missing, so an
+ * officer can see the gaps even though a visitor cannot.
+ *
+ * This reverses the earlier "null renders 'Not yet reported'" decision for
+ * the Chapter Record specifically. Owner's call, 2026-08-24.
+ */
+const columns = allColumns
+  .map((column) => ({ ...column, stats: column.stats.filter((entry) => !isPending(entry.stat)) }))
+  .filter((column) => column.stats.length > 0);
+
+/**
+ * Sources are collected once and listed at the foot of the band, rather than
+ * repeated on every line. Duplicates are collapsed.
+ *
+ * Only the sources behind figures that actually render are cited — otherwise
+ * the page credits a record it is not showing anything from.
+ */
+const sources = [
+  ...new Set(
+    columns
+      .flatMap((column) => column.stats)
+      .map((entry) => entry.stat.source)
+      .filter((s): s is string => Boolean(s)),
+  ),
+];
+
+/** With nothing reported at all, the record has no argument to make. */
+const hasRecord = columns.length > 0;
 ---
 
+{hasRecord && (
 <section aria-labelledby="chapter-record" class="border-y-2 border-gold bg-paper">
   <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
     <header class="reveal max-w-2xl">
@@ -129,6 +156,7 @@ const columns = [
     }
   </div>
 </section>
+)}
 
 <script>
   /**

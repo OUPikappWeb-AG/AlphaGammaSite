@@ -130,7 +130,7 @@ Recorded so a future session doesn't silently undo them.
 | Decision | Rationale |
 |---|---|
 | Tailwind **v4 CSS-first**, no `tailwind.config.mjs` | Spec assumed v3. Installed version is 4.3.3, where CSS `@theme` is the supported path. |
-| Placeholder stats are `"value": null`, **not** `0.00` | Spec sample used `0.00`. Rendering "GPA 0.00" to a parent is worse than rendering nothing. `null` renders "Not yet reported". |
+| Placeholder stats are `"value": null`, **not** `0.00` | Spec sample used `0.00`. Rendering "GPA 0.00" to a parent is worse than rendering nothing. `null` now causes the row to be **omitted** — see the 2026-08-24 reversal below. |
 | `memberPortal` = `https://chapterlink.app/signin` | Spec §3 and the owner both confirm ChapterLink. The `gateway.pikapp.org` value in the spec's sample JSON (line 243) is stale — do not restore it. |
 | Added derived token `gold-text #7E621B` | Spec §9 predicted gold would fail contrast. Confirmed at 2.21:1. |
 | `STRICT_CONTENT` launch gate is **opt-in**, not always-on | An always-on "no TODO in production" assert would block the Phase 1 deploys needed now. Set `STRICT_CONTENT=1` as a Netlify environment variable at real launch. |
@@ -139,6 +139,52 @@ Recorded so a future session doesn't silently undo them.
 | Added `PendingFields.astro`, a **dev-only** banner | The public site hides `TODO`s; without this an officer loses track of what's missing. Stripped from production builds. |
 | Added `.gitattributes` with `eol=lf` | The whole handoff plan depends on editing files on github.com, which writes LF. Without normalisation, browser edits and Windows edits produce whitespace-only diffs. |
 | Placeholder `og-default.png` generated with sharp | Real social card should eventually use a photo. Current one is ink/gold typographic. |
+
+### The first real numbers, and a reversed decision (2026-08-24)
+
+The owner filled in the first live figures. What is now published, all of it
+dated and sourced:
+
+| Figure | Value | `asOf` |
+|---|---|---|
+| Chapter GPA | 3.23 | Spring 2026 |
+| Raised for The Ability Experience | $5,784 | Spring 2026 |
+| Active members | 93 | Spring 2026 |
+| New member class | 10 | Spring 2026 |
+| Dues — new member / active semester | $2,000 / $1,600 | Fall 2026 |
+
+Also filled: `founded` 1923, house address, Instagram, chapter email.
+
+**🔄 Reversal: the Chapter Record now OMITS unreported figures instead of
+labelling them "Not yet reported."** Owner's call, 2026-08-24. With four real
+figures against six blanks, the "Not yet reported" lines stopped reading as
+rigour and started reading as an empty chapter. `ChapterRecord.astro` filters
+on `isPending()`, drops any column left empty, and omits the whole band if
+nothing is reported at all.
+
+Two consequences worth knowing:
+
+- **The rows are still declared in `ChapterRecord.astro` and the fields still
+  live in `chapter.json`.** Filling in a value is all it takes to bring its
+  line back — that was an explicit requirement, not a side effect.
+- **Sources are now derived from the visible figures only**, so the band never
+  credits a record it is showing nothing from. Adding a figure can therefore
+  add a source line on its own.
+
+`StatLine.astro` keeps its "Not yet reported" branch. It is currently unused —
+kept because it is the correct rendering if a pending stat is ever deliberately
+passed.
+
+⚠️ **Deliberately withheld:** the recruitment chair's phone is `"TODO"` on
+purpose (owner's call, 2026-08-24) — it was a personal mobile. `join.astro`
+already guards on `isTodo()`, so the field stays in place and simply does not
+render.
+
+**`chapterEmail` is a Gmail address, knowingly.** Spec §7 and the schema
+comment both want a chapter alias, and `recruitment@oupikapp.com` reads far
+more institutional — but it is the only address the house actually has today.
+Revisit when the alias exists; do not "fix" it to an address that does not
+receive mail.
 
 ### Hosting decision (2026-08-21)
 
@@ -159,6 +205,27 @@ Recorded so a future session doesn't silently undo them.
 Setting `build.format: 'file'` caused two bugs at once: canonical tags published as `https://oupikapp.com/index.html`, and `aria-current="page"` **never rendered at all**, silently killing the nav's active state. Both came from `Astro.url.pathname` varying with build format. Fixed by routing every path comparison and every published URL through `canonicalPath()`. If you add a page or touch nav logic, use that helper.
 
 **Zod 4 deprecations.** `z.string().url()` and `z.string().email()` emit hints. Use `z.url()` and `z.email()`.
+
+**🔴 `chapter.json` is JSON — it cannot hold comments, and it has no optional
+fields.** This bit twice in one session (2026-08-24) and will bite again,
+because commenting out a line you have no data for is the obvious instinct:
+
+- **`//` is a syntax error in JSON.** The file stops parsing entirely — not
+  just the commented line. It also strands whatever bracket the commented
+  block opened.
+- **Every field in `chapter.schema.ts` is required.** Deleting a field, or a
+  whole block like `service`, fails the Zod parse just as hard as bad syntax.
+- **`"value": null` is the only way to say "not reported yet."** It is what
+  the schema is built around, and since the 2026-08-24 reversal it makes the
+  row disappear from the page — which is what commenting-out was reaching for
+  anyway.
+- **Never pre-format a number.** `"$5,784"` fails the schema (`value` is
+  `number | null`) *and* would double-format — `formatStat()` applies the `$`
+  and the comma itself. Write `5784`.
+
+Failure mode to recognise: Netlify reports this as a build error and **keeps
+serving the previous deploy**, so the site simply appears to stop updating.
+Run `npm run build` locally before pushing any `chapter.json` edit.
 
 **Inline scripts in `<head>`** need an explicit `is:inline` directive when they carry attributes, or `astro check` emits a hint.
 
@@ -227,12 +294,18 @@ Hosting is decided (Netlify — see Decisions). What is left, in order:
    `https://github.com/OUPikappWeb-AG/AlphaGammaSite.git` (verified 2026-08-24).
 2. **Disable the Netlify Drawer** — Project configuration → Build & deploy →
    Continuous deployment → Collaboration tools. It injects 33.7 KB of JS and
-   breaks hard rule 8. Dashboard-only; no `netlify.toml` equivalent.
-3. **Wire in the real numbers.** ~~photos~~ — the three house photos are in
-   (2026-08-24). Still outstanding: GPA, service hours, Ability Experience
-   dollars. The owner holds all three. Single highest-leverage change left on the
-   site and it needs no new code — only `chapter.json`, plus each figure's
-   `asOf` and `source`.
+   breaks hard rule 8. Dashboard-only; no `netlify.toml` equivalent. Confirmed
+   still injecting **33,737 bytes** on 2026-08-24, measured against the live
+   host.
+3. **Wire in the remaining numbers.** Photos, GPA, Ability Experience dollars,
+   membership and dues are all in as of 2026-08-24 — see the Decisions table.
+   Still `null`: **service hours**, hours per member, all-men's and
+   all-fraternity comparison GPAs, retention and graduation rates, Ability
+   Experience all-time and Journey of Hope riders. Each needs a value, an
+   `asOf`, and a `source`. Since the 2026-08-24 reversal these rows are simply
+   absent from the page until filled, so nothing looks broken meanwhile — but
+   the comparison GPAs are what make 3.23 *mean* something, so they are the
+   highest-value ones left.
 4. **Then** point `oupikapp.com` (spec §8: copy the exact records **Netlify**
    shows, never IPs from a doc — including this one — and do not touch MX
    records). Immediately afterwards, re-check the HSTS header for a forced

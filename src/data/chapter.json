@@ -1,10 +1,10 @@
 {
-  "lastReviewed": "2026-08-18",
+  "lastReviewed": "2026-08-24",
 
   "identity": {
     "chapterName": "Alpha Gamma",
     "school": "University of Oklahoma",
-    "founded": "TODO",
+    "founded": "1923",
     "nationalFounded": "1904"
   },
 
@@ -13,21 +13,21 @@
     "national": "https://pikapp.org",
     "abilityExperience": "https://abilityexperience.org",
     "properties": "https://pkpproperties.org",
-    "instagram": "TODO"
+    "instagram": "https://instagram.com/oupikapp"
   },
 
   "contact": {
     "recruitmentChair": {
-      "name": "TODO",
-      "email": "recruitment@oupikapp.com",
+      "name": "Blake Wylie",
+      "email": "pikappaphiatou@gmail.com",
       "phone": "TODO"
     },
-    "chapterEmail": "TODO",
-    "houseAddress": "TODO"
+    "chapterEmail": "pikappaphiatou@gmail.com",
+    "houseAddress": "736 Elm Ave, Norman, OK 73069"
   },
 
   "academics": {
-    "chapterGPA":       { "value": null, "asOf": "TODO", "source": "OU Fraternity & Sorority Programs report" },
+    "chapterGPA":       { "value": 3.23, "asOf": "Spring 2026", "source": "OU Fraternity & Sorority Programs report" },
     "allMensAverage":   { "value": null, "asOf": "TODO", "source": "OU Fraternity & Sorority Programs report" },
     "allFraternityAvg": { "value": null, "asOf": "TODO", "source": "OU Fraternity & Sorority Programs report" },
     "retentionRate":    { "value": null, "asOf": "TODO", "source": "Chapter records" },
@@ -40,19 +40,19 @@
   },
 
   "abilityExperience": {
-    "raisedThisYear":      { "value": null, "asOf": "TODO", "source": "Chapter treasurer" },
+    "raisedThisYear":      { "value": 5784, "asOf": "Spring 2026", "source": "Chapter treasurer" },
     "raisedAllTime":       { "value": null, "asOf": "TODO", "source": "Chapter treasurer" },
     "journeyOfHopeRiders": { "value": null, "asOf": "TODO", "source": "Chapter records" }
   },
 
   "membership": {
-    "activeMembers":   { "value": null, "asOf": "TODO", "source": "Chapter roster" },
-    "pledgeClassSize": { "value": null, "asOf": "TODO", "source": "Chapter roster" }
+    "activeMembers":   { "value": 93, "asOf": "Spring 2026", "source": "Chapter roster" },
+    "pledgeClassSize": { "value": 10, "asOf": "Spring 2026", "source": "Chapter roster" }
   },
 
   "dues": {
-    "newMemberSemester": { "value": null, "asOf": "TODO", "source": "Chapter treasurer" },
-    "activeSemester":    { "value": null, "asOf": "TODO", "source": "Chapter treasurer" },
+    "newMemberSemester": { "value": 2000, "asOf": "Fall 2026", "source": "Chapter treasurer" },
+    "activeSemester":    { "value": 1600, "asOf": "Fall 2026", "source": "Chapter treasurer" },
     "includes": ["TODO"],
     "paymentPlansAvailable": true,
     "notes": "TODO"
