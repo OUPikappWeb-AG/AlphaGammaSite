@@ -162,6 +162,31 @@ Setting `build.format: 'file'` caused two bugs at once: canonical tags published
 
 **Inline scripts in `<head>`** need an explicit `is:inline` directive when they carry attributes, or `astro check` emits a hint.
 
+**Astro passes no image quality to sharp unless you set one, and sharp's own
+WebP default is 80.** That is high enough that the 1920w variant re-encoded
+*larger than its source JPEG* — 516 KB from a 398 KB original, behind a single
+eager hero, against a ~142 KB whole-site first-paint budget. `PhotoBand.astro`
+now sets `quality={65}`, which cuts every variant ~25% with no visible loss
+(verified on the 1280w hero: smooth sky gradient, sharp lettering). The
+presets, for reference, are `low: 25, mid: 50, high: 80, max: 100`.
+
+Two things measured here so nobody re-derives them:
+
+- **A cleaner source JPEG produces a *larger* WebP, not a smaller one.** Tested
+  at 1920w/q65: a 399 KB q62 source → 392 KB, a 608 KB q80 source → 413 KB, a
+  984 KB q92 source → 425 KB. So the "under 400 KB" source rule in
+  `src/assets/photos/README.md` *helps* output size. Do not relax it hoping to
+  shrink the delivered image — it does the opposite.
+- **Remaining lever, if the hero is still too heavy:** drop `1920w` from
+  `widths` in `PhotoBand.astro`. The container maxes at 1152px, so this only
+  affects high-DPI screens, and it caps retina at 189 KB instead of 392 KB.
+  Not taken — it is a real quality trade-off on the one photo a parent judges
+  the house by.
+
+**sharp holds a read lock on a file it opened by path**, so
+`sharp('x.jpg').…toFile('x.jpg')` fails on Windows with `UNKNOWN: unknown error`.
+Read into a buffer first (`sharp(fs.readFileSync(p))`), then write.
+
 **Netlify injects a 33.7 KB script unless you stop it.** The "Netlify Drawer"
 (heads-up display) is added *post-build*, so `npm run build` still reports zero
 `.js` files while the live page loads
@@ -198,16 +223,16 @@ so this setting is the only lever there is.
 
 Hosting is decided (Netlify — see Decisions). What is left, in order:
 
-1. **Update the local remote** if it still says `oupikappweb` — GitHub redirects,
-   so a stale remote works silently and misleads:
-   `git remote set-url origin https://github.com/OUPikappWeb-AG/AlphaGammaSite.git`
+1. ~~**Update the local remote.**~~ Done — `origin` is
+   `https://github.com/OUPikappWeb-AG/AlphaGammaSite.git` (verified 2026-08-24).
 2. **Disable the Netlify Drawer** — Project configuration → Build & deploy →
    Continuous deployment → Collaboration tools. It injects 33.7 KB of JS and
    breaks hard rule 8. Dashboard-only; no `netlify.toml` equivalent.
-3. **Wire in the real numbers.** The owner holds GPA, service hours, Ability
-   Experience dollars, and photos. Single highest-leverage change on the site and
-   it needs no new code — only `chapter.json`, plus each figure's `asOf` and
-   `source`.
+3. **Wire in the real numbers.** ~~photos~~ — the three house photos are in
+   (2026-08-24). Still outstanding: GPA, service hours, Ability Experience
+   dollars. The owner holds all three. Single highest-leverage change left on the
+   site and it needs no new code — only `chapter.json`, plus each figure's
+   `asOf` and `source`.
 4. **Then** point `oupikapp.com` (spec §8: copy the exact records **Netlify**
    shows, never IPs from a doc — including this one — and do not touch MX
    records). Immediately afterwards, re-check the HSTS header for a forced
@@ -238,22 +263,49 @@ this site's host; that account matters only to ChapterLink now.
 
 Do not record these phases as done until the domain actually serves the site.
 
-Measured at end of session:
+Measured 2026-08-24 (5 pages now — `/history` and `/housing` shipped):
 
 - `TODO` strings reaching built HTML: **0** across all pages
 - JavaScript files emitted: **0** (both scripts inline)
-- First-paint payload: **~142 KB** uncompressed, 97 KB of it fonts
 - `astro check`: 0 errors / 0 warnings / 0 hints
-- Sitemap contains only `/` and `/join`; 404 correctly excluded
+- Exactly one `<h1>` per page; canonicals extensionless and slash-free
+- First-paint payload **on the text pages: ~142 KB** uncompressed, 97 KB of it
+  fonts. `/housing` is now much heavier — it carries three photographs, one of
+  them eager. See below.
+
+**`/housing` image weight**, after `quality={65}`:
+
+| Viewer | Eager hero (`house-front.jpg`) |
+|---|---|
+| Mobile, 640w | 39 KB |
+| Standard desktop, 1280w | 189 KB |
+| Retina desktop, 1920w | 392 KB |
+
+The other two photos are lazy. 392 KB on a retina hero is the accepted cost of
+the page whose entire job is showing a parent the building; the lever to halve
+it again is recorded under Gotchas and was deliberately not pulled.
 
 ### Built
 
-`index.astro`, `join.astro`, `404.astro`, `Base.astro`, all eight components, the full data layer (`chapter.json` + Zod schema + validated loader), `images.ts`, `url.ts`, `nav.ts`, favicon, robots.txt, OG card, apple-touch icon, and `netlify.toml` (2026-08-21).
+`index.astro`, `join.astro`, `404.astro`, `history.astro`, `housing.astro`,
+`Base.astro`, all eight components, the full data layer (`chapter.json` +
+`history.json` + `housing.json`, each with a Zod schema and validated loader),
+`images.ts`, `url.ts`, `nav.ts`, favicon, robots.txt, OG card, apple-touch icon,
+and `netlify.toml` (2026-08-21).
+
+**House photographs are in** (2026-08-24) — `house-front.jpg` as the eager
+lead, `house-livingroom.jpg` and `house-studyroom.jpg` in the two-column grid
+beneath it, wired through `src/data/housing.json`. All three were checked frame
+by frame at full resolution against hard rule 5: **no alcohol anywhere**,
+including shelves, tables and backgrounds. No identifiable faces — the chapter
+composite on the study-room wall is unreadable at every size the site renders.
+Sources were resized from 2500px/~2 MB to 2000px and under 400 KB to meet the
+rule in `src/assets/photos/README.md`.
 
 ### Not yet built
 
 - **Phase 2:** `/parents`, `/ability-experience` ← the two pages that do the actual persuading
-- **Phase 3:** `/about`, leadership, FAQ — plus `src/content/` collections, `leadership.json`, `faq.json`, `history.json`, `FAQ.astro`
+- **Phase 3:** `/about`, leadership, FAQ — plus `src/content/` collections, `leadership.json`, `faq.json`, `FAQ.astro`. (`history.json` is already built.)
 - **Phase 4:** `README.md`, `EDITING.md`, `HANDOFF.md`, `.github/workflows/semester-review.yml`, analytics, Search Console. **Spec calls these a deliverable, not an afterthought — do not skip.**
   - ⚠️ The spec says "Vercel Analytics (free tier, one line in the layout)". That
     is off the table now. **Netlify Analytics is $9/mo per site, not free**, so
@@ -508,9 +560,11 @@ Order to follow: **deploy to a `*.netlify.app` URL → wire in the real numbers 
    - Email alias: unconfirmed.
    - The two-admin rule is met nowhere yet.
 4. ~~**Vercel Pro vs. Cloudflare Pages/Netlify.**~~ Resolved 2026-08-21 — **Netlify**, free tier, DNS staying at GoDaddy. See the Hosting decision table. This is a documented deviation from `BUILD-SPEC.md` §8, which assumes Vercel throughout; the spec's DNS warnings still apply verbatim, only the record values change. Note it also splits hosting away from ChapterLink, which is on Vercel — acceptable here because this site is `output: 'static'` with no adapter, no functions and no runtime, so there is nothing for the two to share.
-5. **Content still uncollected:** founding year, dues breakdown, comparison GPAs, retention/graduation rates, alumni outcomes, recruitment chair details, house address, Instagram handle, housing details, anti-hazing paragraph, and whether national HQ permits use of official marks. Full list in `BUILD-SPEC.md` §11.
+5. **Content still uncollected:** founding year, dues breakdown, comparison GPAs, retention/graduation rates, alumni outcomes, recruitment chair details, house address, Instagram handle, anti-hazing paragraph, and whether national HQ permits use of official marks. Full list in `BUILD-SPEC.md` §11.
 
-The owner has confirmed they hold photos, service hours, Ability Experience dollars, and GPA figures — they chose to wire them in later rather than during the last session.
+The owner has confirmed they hold service hours, Ability Experience dollars, and
+GPA figures — still to be wired in. **Photos are done** (2026-08-24): three house
+photographs are live on `/housing`.
 
 ---
 

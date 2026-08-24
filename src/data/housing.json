@@ -1,5 +1,21 @@
 {
-  "lastReviewed": "2026-08-21",
+  "lastReviewed": "2026-08-24",
 
-  "photos": []
+  "photos": [
+    {
+      "file": "house-front.jpg",
+      "alt": "The chapter house from the front lawn: a two-storey red brick building with a white columned portico and PI KAPPA PHI lettered across it",
+      "caption": "The house from the front lawn"
+    },
+    {
+      "file": "house-livingroom.jpg",
+      "alt": "The main living room, with a grand piano, hardwood floors, sectional seating and a fireplace at the far end",
+      "caption": "Main living room"
+    },
+    {
+      "file": "house-studyroom.jpg",
+      "alt": "The study room, with a long high table and stools, built-in bookshelves and chapter composites on the wall",
+      "caption": "Study room"
+    }
+  ]
 }
