@@ -84,7 +84,7 @@ These are non-negotiable. Several protect real people or the chapter's standing.
 
 1. **Never invent a statistic, name, date, or dollar figure.** Everything unknown stays `TODO` / `null`. The site's entire value is that its numbers are trustworthy.
 2. **No number is ever hardcoded in a component.** It comes from `chapter.json`, through `src/lib/chapter.ts`, and renders with its `asOf` stamp.
-3. **Placeholder prose stays as text marked "Example."** The owner writes the real copy. Do not draft persuasive fraternity marketing copy on their behalf unless asked.
+3. ~~**Placeholder prose stays as text marked "Example."**~~ **Superseded 2026-09-09 — the owner asked for drafts.** There is no "Example" copy left on the site. What is there now is a first draft written to be revised, not final text. Do not revert it to placeholders, and do not raise its temperature: it is deliberately humble and deliberately dash-free (owner's request). The two paragraphs still reserved for the owner are the **anti-hazing statement** on `/parents` and anything describing chapter conduct.
 4. **A `TODO` must never render to a visitor.** Components omit placeholder fields instead. Verify after building (see Verification below).
 5. **No alcohol visible in any photo, ever.** Parent-facing site and national risk-management policy.
 6. **Every image requires meaningful alt text** — enforced by the `PhotoBand` prop type.
@@ -139,6 +139,42 @@ Recorded so a future session doesn't silently undo them.
 | Added `PendingFields.astro`, a **dev-only** banner | The public site hides `TODO`s; without this an officer loses track of what's missing. Stripped from production builds. |
 | Added `.gitattributes` with `eol=lf` | The whole handoff plan depends on editing files on github.com, which writes LF. Without normalisation, browser edits and Windows edits produce whitespace-only diffs. |
 | Placeholder `og-default.png` generated with sharp | Real social card should eventually use a photo. Current one is ink/gold typographic. |
+
+### First draft of the prose (2026-09-09)
+
+Every `Example` placeholder is gone. Owner asked for human-sounding, humble,
+**no-dash** copy so the site could be shown around for feedback. What was
+written, and the constraints it was written under:
+
+| Where | What it now says |
+|---|---|
+| `index` hero, philanthropy, recruitment band | Chapter framing, The Ability Experience, an invitation to visit |
+| `ChapterRecord` header | Rewritten — the old text promised "this page says so rather than estimating," which the 2026-08-24 omit-reversal made **false**. It now describes omission correctly. |
+| `join` lede, three steps, contact paragraph | Reach out → visit → accept a bid. No dates, no durations. |
+| `history` lede + national context | Owner's facts kept, spelling fixed. The national paragraph was **verbatim marketing text lifted from pikapp.org** and violated the copy-voice rule; replaced with the verifiable founding facts. |
+| `housing` lede + properties paragraph | Owner's facts kept, spelling fixed, claim about safety standards softened to what the chapter can actually vouch for. |
+
+Rules the copy follows, so an edit does not quietly break them:
+
+- **No dashes at all in visible prose.** Em, en, or hyphenated compounds.
+  Owner's explicit request. (Two `—` remain in output: an HTML comment and the
+  Wordmark `aria-label`, both pre-existing.)
+- **No new numbers.** The only figures in prose are 1977 (The Ability
+  Experience), and the charter dates the owner supplied. Everything
+  quantitative still comes from `chapter.json`.
+- **Externally verifiable claims only.** Founding facts checked against
+  `abilityexperience.org` and Wikipedia; OU's Interfraternity Council
+  recruitment is referenced without dates because those go stale annually.
+- **Humility is load-bearing.** `/history` says the century "has not been
+  unbroken"; `/index` says "including about the parts we are still working
+  on"; `/join` says deciding against a fraternity "is a perfectly good
+  outcome." A parent believes the good numbers *because* of lines like these.
+  Do not edit them out as negative.
+
+⚠️ Also repaired here: `src/pages/join.astro` had an **uncommitted broken
+line** in the working tree (`l} variant="outline"...`) that would have failed
+the build. Restored to the `<CTAButton href={chapter.links.memberPortal}>` it
+was.
 
 ### The first real numbers, and a reversed decision (2026-08-24)
 

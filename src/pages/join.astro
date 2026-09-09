@@ -21,28 +21,29 @@ const hasEmail = !isTodo(recruitmentChair.email);
 const hasPhone = !isTodo(recruitmentChair.phone);
 
 /**
- * Placeholder recruitment steps. Replace the text; keep the shape — a short
- * numbered sequence is what makes an unfamiliar process feel manageable.
+ * The recruitment steps. Keep the shape — a short numbered sequence is what
+ * makes an unfamiliar process feel manageable. Deliberately no dates and no
+ * durations: both go stale, and the recruitment chair can answer either.
  */
 const steps = [
   {
-    title: 'Example first step',
-    body: 'Example description of what a potential new member does first, and roughly how long it takes.',
+    title: 'Get in touch',
+    body: 'Email our recruitment chair, or find us at an event on campus. Tell him your name and your year. There is no application to fill out at this stage, and nothing is expected of you afterwards.',
   },
   {
-    title: 'Example second step',
-    body: 'Example description of meeting the chapter, what those conversations are like, and who will be there.',
+    title: 'Come to the house',
+    body: 'Spend some time with the chapter. Eat a meal, watch a game, meet the people you would actually be living and studying alongside. Ask about grades, cost, and how much time this takes. We would much rather you asked early.',
   },
   {
-    title: 'Example third step',
-    body: 'Example description of receiving and accepting a bid, and what the commitment involves.',
+    title: 'Accept a bid',
+    body: 'If it looks like a fit on both sides, we extend a bid. Accepting it begins a new member period, where you learn the history of the fraternity and get to know the chapter before initiation. Ask the recruitment chair exactly what that involves and what it costs.',
   },
 ];
 ---
 
 <Base
   title="Join"
-  description="We recuit year round."
+  description="How to join the Alpha Gamma Chapter of Pi Kappa Phi at the University of Oklahoma, and who to contact."
 >
   <!-- ── Header ────────────────────────────────────────────────────── -->
   <section class="mx-auto max-w-6xl px-5 pb-14 pt-16 sm:px-8 sm:pt-24">
@@ -55,8 +56,11 @@ const steps = [
     <div class="mt-8 h-px w-24 bg-gold" aria-hidden="true"></div>
 
     <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate">
-      Example paragraph. State plainly that there is no obligation in reaching out, and that
-      questions from parents are welcome too.
+      There is no obligation in reaching out. Plenty of people talk to us, come to a few things,
+      and decide a fraternity is not for them, which is a perfectly good outcome. The university
+      also runs a formal recruitment period through the Interfraternity Council, and you can go
+      through that if you prefer, but you do not have to wait for it to talk to us. Parents are
+      welcome to write with questions of their own.
     </p>
   </section>
 
@@ -91,7 +95,9 @@ const steps = [
             Questions are welcome
           </h2>
           <p class="mt-4 max-w-md text-base leading-relaxed text-slate">
-            Example paragraph. Parents are explicitly invited to write directly.
+            Write to the recruitment chair below. He is a student, so give him a day or two. If you
+            are a parent and you would rather ask about safety, academics, or what this costs, say
+            so in your email and we will put you in front of the right officer.
           </p>
         </div>
 
