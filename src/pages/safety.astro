@@ -1,0 +1,245 @@
+---
+/**
+ * /safety — hazing, conduct, and how to report a problem.
+ *
+ * WHAT THIS PAGE IS FOR
+ * ---------------------
+ * It is the page a worried parent is actually looking for. It works only if
+ * it does not ask to be taken on trust, so almost everything on it points
+ * *outside* the chapter: the state law, the university's policy and its
+ * public record of hazing findings, the national fraternity's position, and
+ * report lines the chapter does not control. The chapter's own statement is
+ * one short section among them, not the whole page.
+ *
+ * ⚠️ DRAFT: the "Where we stand" section is a first draft written at the
+ * owner's request (2026-09-28) and must be revised by the owner before the
+ * domain goes live. It describes chapter conduct, which only the chapter can
+ * vouch for. Keep it plain and humble; do not add claims the chapter cannot
+ * stand behind if a parent asks.
+ *
+ * Every link here lives in chapter.json → safety, so an officer can update a
+ * URL or phone number without touching this file. Do not add a named adult,
+ * an advisor, or a house director until the owner supplies one.
+ */
+import Base from '../layouts/Base.astro';
+import CTAButton from '../components/CTAButton.astro';
+import { chapter, isTodo } from '../lib/chapter';
+
+const { safety, contact } = chapter;
+
+const hasChapterEmail = !isTodo(contact.chapterEmail);
+const hotlineHref = `tel:+1${safety.ouHotline.replace(/\D/g, '')}`;
+
+/** The three bodies whose rules apply to the chapter, outermost first. */
+const rules = [
+  {
+    name: 'Oklahoma law',
+    body: 'Hazing is a crime in Oklahoma under Title 21, Section 1190 of the state statutes. The law applies to individual students as well as to the organizations they belong to.',
+    href: safety.oklahomaStatute,
+    linkLabel: 'Read the statute',
+  },
+  {
+    name: 'The University of Oklahoma',
+    body: 'OU prohibits hazing under its own hazing policy, which applies to every student organization on campus, and it investigates the reports it receives.',
+    href: safety.ouPolicies,
+    linkLabel: 'OU hazing laws and policies',
+  },
+  {
+    name: 'Pi Kappa Phi',
+    body: 'The national fraternity states that its Supreme Chapter and National Council "unequivocally oppose all acts of hazing." Its published statements of position also cover alcohol, drugs, and sexual misconduct.',
+    href: safety.nationalPositions,
+    linkLabel: 'Pi Kappa Phi statements of position',
+  },
+];
+---
+
+<Base
+  title="Safety and conduct"
+  description="Where the Alpha Gamma Chapter of Pi Kappa Phi stands on hazing, the rules it is held to, and how to report a problem without going through the chapter."
+>
+  <!-- ── Header ────────────────────────────────────────────────────── -->
+  <section class="mx-auto max-w-6xl px-5 pb-14 pt-16 sm:px-8 sm:pt-24">
+    <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-slate">
+      Safety and conduct
+    </p>
+
+    <h1 class="mt-5 max-w-3xl text-[2.5rem] leading-[1.08] sm:text-5xl">
+      Hazing, safety, and how to report a problem
+    </h1>
+
+    <div class="mt-8 h-px w-24 bg-gold" aria-hidden="true"></div>
+
+    <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate">
+      If you are a parent, this is probably the page you came for. Below is where the chapter
+      stands, the rules we are held to by people other than ourselves, and how to report something
+      without going through us at all.
+    </p>
+  </section>
+
+  <!-- ── Where we stand (DRAFT: owner to revise) ───────────────────── -->
+  <section aria-labelledby="stance" class="mx-auto max-w-6xl px-5 pb-20 sm:px-8">
+    <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16">
+      <div>
+        <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-gold-text">
+          Our position
+        </p>
+        <h2 id="stance" class="mt-3 text-3xl leading-tight sm:text-4xl">Where we stand</h2>
+      </div>
+
+      <div class="border-l-2 border-gold pl-6 sm:pl-8">
+        <p class="text-base leading-relaxed text-slate sm:text-lg">
+          Hazing has no place in joining this chapter. No one should be asked to do anything
+          humiliating, dangerous, or illegal to become a member, and a bid never depends on it. The
+          new member period is for learning the history of the fraternity and getting to know the
+          people in it.
+        </p>
+        <p class="mt-4 text-base leading-relaxed text-slate sm:text-lg">
+          If a new member is ever asked to do something that feels wrong, he can say no, and he can
+          report it using any of the routes below. We would rather hear about a problem early, from
+          anyone, than find out about it later. Raising a concern should never cost anyone their
+          bid.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── The rules we are held to ──────────────────────────────────── -->
+  <section aria-labelledby="rules" class="border-y-2 border-gold bg-paper">
+    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+      <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-gold-text">
+        Not our rules alone
+      </p>
+      <h2 id="rules" class="mt-3 max-w-2xl text-3xl leading-tight sm:text-4xl">
+        The rules we are held to
+      </h2>
+      <p class="mt-4 max-w-2xl text-base leading-relaxed text-slate">
+        The chapter answers to three bodies outside itself. Each one publishes its own rules, so you
+        can read them in the original rather than in our summary.
+      </p>
+
+      <ol class="mt-10 grid gap-px border border-ink/10 bg-ink/10 lg:grid-cols-3">
+        {
+          rules.map((rule) => (
+            <li class="flex flex-col bg-paper p-6 sm:p-8">
+              <h3 class="text-xl leading-snug">{rule.name}</h3>
+              <p class="mt-3 flex-1 text-[0.9375rem] leading-relaxed text-slate">{rule.body}</p>
+              <a
+                href={rule.href}
+                target="_blank"
+                rel="noopener"
+                class="mt-5 inline-block py-1 text-[0.9375rem] text-royal underline underline-offset-4"
+              >
+                {rule.linkLabel}
+                <span aria-hidden="true"> ↗</span>
+                <span class="sr-only">(opens in a new tab)</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ── Check the record ──────────────────────────────────────────── -->
+  <section aria-labelledby="record" class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+    <div class="border border-ink/10 p-6 sm:p-10">
+      <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-12">
+        <div class="max-w-2xl">
+          <p class="font-mono text-[0.6875rem] uppercase tracking-[0.16em] text-gold-text">
+            Public record
+          </p>
+          <h2 id="record" class="mt-3 text-2xl leading-snug sm:text-3xl">
+            Check the record yourself
+          </h2>
+          <p class="mt-4 text-base leading-relaxed text-slate">
+            Federal law now requires universities to publish every case in which a student
+            organization was found responsible for hazing. OU's report names the organization,
+            describes what happened, and gives the outcome. We would rather you read it than take
+            our word for anything on this page.
+          </p>
+        </div>
+
+        <CTAButton href={safety.ouTransparencyReport} variant="outline" external class="shrink-0">
+          OU hazing transparency report
+        </CTAButton>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── How to report ─────────────────────────────────────────────── -->
+  <section aria-labelledby="report" class="border-t border-ink/10 bg-ink text-paper">
+    <div class="mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
+      <h2 id="report" class="max-w-2xl text-3xl leading-tight sm:text-4xl">
+        How to report something
+      </h2>
+      <p class="mt-4 max-w-2xl text-base leading-relaxed text-paper/70 sm:text-lg">
+        You never have to go through the chapter to report a problem. Any of these routes works, and
+        the first three are run by people outside it.
+      </p>
+
+      <dl class="mt-10 grid gap-x-12 gap-y-8 sm:grid-cols-2">
+        <div class="border-t border-paper/15 pt-5">
+          <dt class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-gold">
+            In an emergency
+          </dt>
+          <dd class="mt-2 text-base leading-relaxed text-paper/70">
+            Call <a href="tel:911" class="text-paper underline underline-offset-4">911</a>. Do not
+            wait to report it anywhere else first.
+          </dd>
+        </div>
+
+        <div class="border-t border-paper/15 pt-5">
+          <dt class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-gold">
+            To the university
+          </dt>
+          <dd class="mt-2 text-base leading-relaxed text-paper/70">
+            OU takes reports through{' '}
+            <a
+              href={safety.ouReportForm}
+              target="_blank"
+              rel="noopener"
+              class="text-paper underline underline-offset-4"
+              >its online reporting page<span class="sr-only"> (opens in a new tab)</span></a
+            >, and by phone on a line run by an independent company at{' '}
+            <a href={hotlineHref} class="whitespace-nowrap text-paper underline underline-offset-4"
+              >{safety.ouHotline}</a
+            >.
+          </dd>
+        </div>
+
+        <div class="border-t border-paper/15 pt-5">
+          <dt class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-gold">
+            To the national fraternity
+          </dt>
+          <dd class="mt-2 text-base leading-relaxed text-paper/70">
+            Pi Kappa Phi runs{' '}
+            <a
+              href={safety.nationalReport}
+              target="_blank"
+              rel="noopener"
+              class="text-paper underline underline-offset-4"
+              >an anonymous reporting line<span class="sr-only"> (opens in a new tab)</span></a
+            >. The person reporting is not identified.
+          </dd>
+        </div>
+
+        {
+          hasChapterEmail && (
+            <div class="border-t border-paper/15 pt-5">
+              <dt class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-gold">
+                To us
+              </dt>
+              <dd class="mt-2 text-base leading-relaxed text-paper/70">
+                If you would rather start with the chapter, write to{' '}
+                <a
+                  href={`mailto:${contact.chapterEmail}`}
+                  class="text-paper underline underline-offset-4 [overflow-wrap:anywhere]"
+                >{contact.chapterEmail}</a>. You never have to.
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+    </div>
+  </section>
+</Base>

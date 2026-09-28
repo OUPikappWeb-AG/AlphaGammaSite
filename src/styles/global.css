@@ -110,6 +110,15 @@
     border-radius: var(--radius-xs);
   }
 
+  /*
+   * On the ink ground royal all but vanishes (1.6:1, under the 3:1 minimum for
+   * a focus indicator). Gold on ink is 7.5:1. This covers the footer and every
+   * ink band, since both carry the bg-ink utility.
+   */
+  .bg-ink :focus-visible {
+    outline-color: var(--color-gold);
+  }
+
   /* Only show focus rings for keyboard users, but never suppress them entirely. */
   :focus:not(:focus-visible) {
     outline: none;
@@ -130,7 +139,15 @@
  * ------------------------------------------------------------------ */
 
 @layer components {
-  .reveal {
+  /*
+   * Hiding is opt-in. Content marked .reveal is only hidden once the reveal
+   * script itself has run and added .reveal-ready to <html>, immediately
+   * before it starts observing. If that script is blocked, errors, or never
+   * loads, nothing is ever hidden. The earlier approach hid by default and
+   * relied on .no-js, which a *different* script removed, so a failure in
+   * between left the Chapter Record invisible.
+   */
+  .reveal-ready .reveal {
     opacity: 0;
     transform: translateY(0.75rem);
     transition:
@@ -138,20 +155,57 @@
       transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .reveal.is-visible {
+  .reveal-ready .reveal.is-visible {
     opacity: 1;
     transform: none;
   }
 
   /*
-   * Fallback: if JavaScript never runs, the reveal class would leave content
-   * invisible forever. `.no-js` is set on <html> and cleared by the reveal
-   * script, so content is always readable without JS.
+   * Mobile menu. Without JavaScript the Menu button can do nothing, so it is
+   * hidden and the menu is simply shown open, which keeps every page reachable
+   * on a phone. With JavaScript the menu is closed until toggled.
    */
-  .no-js .reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
+  html:not(.no-js) #mobile-menu:not(.is-open) {
+    display: none;
+  }
+
+  .no-js #menu-toggle {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Print
+ *
+ * A parent printing a page, or saving it as a PDF to read later, should get
+ * the content and the figures, not the navigation or an ink slab of footer.
+ * ------------------------------------------------------------------ */
+
+@media print {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* The nav links and member button carry Tailwind's print:hidden utility. */
+  #menu-toggle,
+  #mobile-menu {
+    display: none !important;
+  }
+
+  footer.bg-ink {
+    background: none !important;
+    color: var(--color-ink) !important;
+  }
+
+  footer.bg-ink * {
+    color: var(--color-ink) !important;
+  }
+
+  main a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    word-break: break-all;
   }
 }
 

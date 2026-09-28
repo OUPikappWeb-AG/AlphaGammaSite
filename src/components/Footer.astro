@@ -45,20 +45,20 @@ const externalLinks = [
 
       <div>
         <h2 class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-gold">Contact</h2>
-        <ul class="mt-4 space-y-2 text-sm text-paper/70">
+        <ul class="mt-3 space-y-0.5 text-sm text-paper/70">
           {
             hasEmail && (
               <li>
                 <a
                   href={`mailto:${contact.chapterEmail}`}
-                  class="underline-offset-4 hover:text-paper hover:underline"
+                  class="inline-block py-1.5 underline-offset-4 hover:text-paper hover:underline"
                 >
                   {contact.chapterEmail}
                 </a>
               </li>
             )
           }
-          {hasAddress && <li class="leading-relaxed">{contact.houseAddress}</li>}
+          {hasAddress && <li class="py-1.5 leading-relaxed">{contact.houseAddress}</li>}
           {
             !hasEmail && !hasAddress && (
               <li class="text-paper/50">Contact details coming soon.</li>
@@ -69,7 +69,7 @@ const externalLinks = [
 
       <div>
         <h2 class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-gold">Elsewhere</h2>
-        <ul class="mt-4 space-y-2 text-sm text-paper/70">
+        <ul class="mt-3 space-y-0.5 text-sm text-paper/70">
           {
             externalLinks.map((link) => (
               <li>
@@ -77,10 +77,11 @@ const externalLinks = [
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="underline-offset-4 hover:text-paper hover:underline"
+                  class="inline-block py-1.5 underline-offset-4 hover:text-paper hover:underline"
                 >
                   {link.label}
                   <span aria-hidden="true"> ↗</span>
+                  <span class="sr-only">(opens in a new tab)</span>
                 </a>
               </li>
             ))

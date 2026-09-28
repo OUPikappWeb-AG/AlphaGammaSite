@@ -8,7 +8,7 @@
  * phone, by someone who has never written code. That is a good thing, but it
  * means a typo can reach the repository unreviewed. This schema is the safety
  * net: if an edit is malformed, `npm run build` stops with a readable error and
- * Vercel refuses to deploy. A broken edit therefore fails loudly instead of
+ * Netlify refuses to deploy. A broken edit therefore fails loudly instead of
  * silently publishing a wrong number to parents.
  *
  * You should not need to touch this file to update content. You only touch it
@@ -24,8 +24,13 @@
  * - `asOf`   the period the number describes — rendered under the stat
  * - `source` where it came from — for accountability if anyone asks
  *
- * `value` is nullable on purpose. An unknown GPA must render as "Not yet
- * reported", never as "0.00". A zero is a claim; null is an honest absence.
+ * `value` is nullable on purpose. An unknown GPA must never render as "0.00".
+ * A zero is a claim; null is an honest absence, and the line is left off the
+ * page until a real figure arrives.
+ *
+ * A reported value must also carry a real `asOf`. A number with `"asOf":
+ * "TODO"` fails the build, because a figure without its period is exactly the
+ * undated claim this site exists not to make.
  */
 
 import { z } from 'zod';
@@ -50,6 +55,9 @@ const stat = (opts: { min?: number; max?: number } = {}) =>
     source: filled
       .optional()
       .describe('Where this number came from, e.g. "OU FSPL report".'),
+  }).refine((s) => s.value === null || s.asOf.trim() !== 'TODO', {
+    path: ['asOf'],
+    message: 'A reported value needs a real asOf, e.g. "Spring 2026".',
   });
 
 export const statSchema = stat();
@@ -93,9 +101,31 @@ export const chapterSchema = z.object({
     instagram: z.union([z.url(), z.literal('TODO')]),
   }),
 
+  /**
+   * Where a parent or student can check the rules and report a problem
+   * without going through the chapter. Rendered on /safety. Every one of
+   * these is an outside authority on purpose: a report line the chapter
+   * controls is not much of a safeguard.
+   */
+  safety: z.object({
+    ouReportForm: z.url(),
+    /** Display form, e.g. "(844) 428 6531". The tel: link is built from the digits. */
+    ouHotline: filled,
+    /** OU's Campus Hazing Transparency Report, required by federal law. */
+    ouTransparencyReport: z.url(),
+    ouPolicies: z.url(),
+    oklahomaStatute: z.url(),
+    nationalReport: z.url(),
+    nationalPositions: z.url(),
+  }),
+
   contact: z.object({
+    /**
+     * Deliberately no `name` field. A student's name goes stale at every
+     * officer turnover and publishes a private person; the role does not.
+     * Removed 2026-09-28, owner's call.
+     */
     recruitmentChair: z.object({
-      name: filled,
       /** Use a chapter alias, never a personal address — officers graduate. */
       email: z.union([z.email(), z.literal('TODO')]),
       phone: filled,

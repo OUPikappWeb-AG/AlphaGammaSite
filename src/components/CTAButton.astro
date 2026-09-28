@@ -21,7 +21,9 @@ const base =
   'inline-flex items-center justify-center gap-2 rounded-xs px-6 py-3.5 font-mono text-[0.75rem] uppercase tracking-[0.12em] transition-colors';
 
 const variants = {
-  solid: 'bg-ink text-paper hover:bg-royal',
+  // The transparent border is invisible normally, but in Windows High Contrast
+  // the background is stripped and the border is what outlines the button.
+  solid: 'border border-transparent bg-ink text-paper hover:bg-royal',
   outline: 'border border-ink/25 text-ink hover:border-royal hover:text-royal',
   onDark: 'border border-paper/35 text-paper hover:border-gold hover:text-gold',
 } as const;

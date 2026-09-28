@@ -66,8 +66,8 @@ src/
 │  └─ images.ts           ← filename → optimized asset
 ├─ layouts/Base.astro     ← SEO, OG, JSON-LD, fonts, skip link
 ├─ components/            ← ChapterRecord, StatLine, Nav, Footer, Wordmark,
-│                            CTAButton, PhotoBand, PendingFields
-├─ pages/                 ← index, join, 404
+│                            CTAButton, PhotoBand, PendingFields, Timeline
+├─ pages/                 ← index, join, history, housing, safety, 404
 └─ styles/global.css      ← Tailwind import + @theme tokens + base styles
 ```
 
@@ -84,7 +84,7 @@ These are non-negotiable. Several protect real people or the chapter's standing.
 
 1. **Never invent a statistic, name, date, or dollar figure.** Everything unknown stays `TODO` / `null`. The site's entire value is that its numbers are trustworthy.
 2. **No number is ever hardcoded in a component.** It comes from `chapter.json`, through `src/lib/chapter.ts`, and renders with its `asOf` stamp.
-3. ~~**Placeholder prose stays as text marked "Example."**~~ **Superseded 2026-09-09 — the owner asked for drafts.** There is no "Example" copy left on the site. What is there now is a first draft written to be revised, not final text. Do not revert it to placeholders, and do not raise its temperature: it is deliberately humble and deliberately dash-free (owner's request). The two paragraphs still reserved for the owner are the **anti-hazing statement** on `/parents` and anything describing chapter conduct.
+3. ~~**Placeholder prose stays as text marked "Example."**~~ **Superseded 2026-09-09 — the owner asked for drafts.** There is no "Example" copy left on the site. What is there now is a first draft written to be revised, not final text. Do not revert it to placeholders, and do not raise its temperature: it is deliberately humble and deliberately dash-free (owner's request). Anything describing chapter conduct is still the owner's to sign off. The **anti-hazing statement** on `/safety` was drafted at the owner's explicit request on 2026-09-28 and is marked DRAFT in the page source: it must be revised by the owner, not polished by us.
 4. **A `TODO` must never render to a visitor.** Components omit placeholder fields instead. Verify after building (see Verification below).
 5. **No alcohol visible in any photo, ever.** Parent-facing site and national risk-management policy.
 6. **Every image requires meaningful alt text** — enforced by the `PhotoBand` prop type.
@@ -176,6 +176,51 @@ line** in the working tree (`l} variant="outline"...`) that would have failed
 the build. Restored to the `<CTAButton href={chapter.links.memberPortal}>` it
 was.
 
+### Pre-launch review and fixes (2026-09-28)
+
+A four-angle review (build/SEO, content, live site and DNS, accessibility)
+ran before the domain cutover. What it changed:
+
+**🔴 The published GPA was wrong.** `chapter.json` said 3.23 and credited OU's
+Fraternity and Sorority Programs report. OU's own public Spring 2026 Community
+Scholarship Report says **3.0016**, 15th of 16 IFC chapters. 3.23 matched no
+Pi Kappa Phi line in the Spring 2026, Fall 2025 or Spring 2025 reports. Any
+parent can download that PDF, so this was the single most damaging thing on the
+site. Corrected to `3.0016`, and the **All-Fraternity average 3.2662** is now
+published beside it (owner's call: show it with the comparison). There is no
+all-men's average in that report; `allMensAverage` stays `null`.
+
+> **Lesson:** check every figure against the document its `source` names,
+> before publishing. Report URL pattern:
+> `ou.edu/content/dam/studentlife/fsps/fsps-assets/fsps-site-documents/fsps-grade-reports/`
+
+| Decision | Rationale |
+|---|---|
+| **No student name on the site.** `recruitmentChair.name` removed from the schema and JSON; `/join` says "Our recruitment chair" | Owner's call. A name goes stale at every officer turnover and publishes a private student. Do not add it back. |
+| **New `/safety` page** + `chapter.json → safety` block | Owner asked for it. Almost everything on it points *outside* the chapter: Oklahoma statute 21 O.S. § 1190, OU's hazing policy, OU's federally required **Campus Hazing Transparency Report** (Pi Kappa Phi was not listed on it, 2026-09-28; the page links the report rather than claiming that, so it cannot go stale), Pi Kappa Phi's statement of position, and three report routes the chapter does not control. The "Where we stand" section is a **DRAFT for the owner**. |
+| Hero second button → `/safety` ("Safety and conduct") | It used to send a parent off-site to abilityexperience.org before they had scrolled. That section has its own link further down. |
+| Reveal hiding is now **opt-in** (`.reveal-ready` on `<html>`, set by the reveal script itself) | The old default hid `.reveal` and relied on `.no-js`, which a *different* script removed. Printing `/` produced a blank Chapter Record, and a failed module script would have hidden it permanently. Verified in headless Chrome: visible with JS off and in print. |
+| Mobile menu works **without JavaScript** | It used the `hidden` attribute, so with JS off a phone could reach no page but home. Now `.no-js` shows it open and hides the Menu button. It also moved inside the `<nav>` landmark. |
+| Gold focus ring on `.bg-ink` | Royal on ink measured 1.64:1, under the 3:1 minimum. Keyboard users lost their place in the footer. |
+| Schema rejects a reported value whose `asOf` is `"TODO"` | Otherwise a number could publish undated, breaking hard rule 2 silently. |
+| `STRICT_CONTENT` compares to `'1'` exactly | `STRICT_CONTENT=0` used to turn the gate *on*. |
+| "Service and chapter" column is titled "Philanthropy and chapter" until a service figure exists | It showed no service figure. |
+| `PhotoBand` takes a `sizes` prop; the `/housing` grid passes its real width | Grid photos render at 532px but told the browser 1152px, so they downloaded about 2× the needed file. |
+| 404 no longer publishes a canonical or `og:url` | It pointed at `https://oupikapp.com/404`, which does not exist. |
+| **Not done on purpose:** `*.netlify.app` → `oupikapp.com` 301 in `netlify.toml` | Correct to add, but **only at cutover**. Added now, it would redirect the working netlify.app site to a domain still serving GoDaddy's page. |
+
+Copy fixes, same session: Gear Up Florida crosses the state, not the country;
+"it is the honest version" → "it shows where each figure came from"; "Start
+here" → "How to visit"; "Visit the site" → "Pi Kappa Phi Properties";
+"two-storey" in alt text. All dead `EDITING.md` references now point at real
+files, and the remaining Vercel mentions in code comments say Netlify.
+
+**⚠️ Astro drops the space before an inline `<a>` that starts on a new line.**
+Source text `through\n<a …>its page</a>` renders as "throughits page". Put `{' '}`
+at the end of the preceding line. This bit twice on `/safety` and once on `/join`
+in the same session. Only a screenshot showed it; the build and `astro check`
+say nothing.
+
 ### The first real numbers, and a reversed decision (2026-08-24)
 
 The owner filled in the first live figures. What is now published, all of it
@@ -183,11 +228,11 @@ dated and sourced:
 
 | Figure | Value | `asOf` |
 |---|---|---|
-| Chapter GPA | 3.23 | Spring 2026 |
+| Chapter GPA | ~~3.23~~ **3.00** (corrected 2026-09-28, see below) | Spring 2026 |
 | Raised for The Ability Experience | $5,784 | Spring 2026 |
 | Active members | 93 | Spring 2026 |
 | New member class | 10 | Spring 2026 |
-| Dues — new member / active semester | $2,000 / $1,600 | Fall 2026 |
+| Dues — new member / active semester | $2,000 / $1,600 | Fall 2026 — ⚠️ in `chapter.json` but **rendered on no page** yet |
 
 Also filled: `founded` 1923, house address, Instagram, chapter email.
 
@@ -310,6 +355,14 @@ on `oupikapp.com` once DNS is pointed.** If `includeSubDomains` is forced there
 too, it silently commits `app.oupikapp.com` to HTTPS-only before ChapterLink
 exists.
 
+⚠️ **It has already happened, from GoDaddy** (verified 2026-09-28). The GoDaddy
+Website Builder page currently on `oupikapp.com` sends
+`Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`. Any
+browser that has visited it has cached HTTPS-only for `app.oupikapp.com` for two
+years. The domain is **not** on the preload list, so this is limited to those
+browsers. Practical upshot: ChapterLink on `app.` must serve HTTPS from day one
+(it will on Vercel anyway). Nothing in `netlify.toml` needs to change.
+
 **Netlify "Pretty URLs" fights `trailingSlash: 'never'`.** It is ON by default.
 Astro's directory output emits `dist/join/index.html`, and Pretty URLs turns
 that into a 301 from `/join` to `/join/` — while the canonical tag and the
@@ -324,8 +377,30 @@ so this setting is the only lever there is.
 
 ## Next session — start here
 
-Hosting is decided (Netlify — see Decisions). What is left, in order:
+Hosting is decided (Netlify — see Decisions). As of 2026-09-28 the site-side
+fixes from the pre-launch review are done (see "Pre-launch review and fixes").
+What is left before the domain goes live, in order:
 
+0. **Owner sign-off, blocking cutover:**
+   - Revise the DRAFT "Where we stand" statement on `/safety`.
+   - **`/history` has factual problems.** Wikipedia's chapter list and OU's
+     IFC page ("re-established in 2011") show the chapter active 1923–1938,
+     1971–1984, 1988–2007 and again since 2011. The page describes a single
+     1936–1969 closure. It also calls Alpha Gamma the "23rd chapter", where
+     the national charter order puts it 27th. The large "103 years at OU"
+     figure counts roughly 40 dormant years, directly under a paragraph that
+     promises not to round the history off. Unsourced: the Depression as the
+     cause, the 1980 "Master Chapter" award, and "only Pi Kappa Phi chapter
+     living coed". **The owner decides what to say; do not rewrite the
+     closure history without them.**
+   - `/housing`: confirm Pi Kappa Phi Properties actually owns 736 Elm (its
+     site does not list OU), and whether "owned and run by alumni" is accurate.
+     It is a staffed organization with a board.
+   - Dues: `includes`, whether rent or meals are covered, the payment-plan
+     terms, and hardship `notes`. Then render them (they currently appear
+     nowhere).
+   - `raisedThisYear` $5,784 is stamped "Spring 2026". Confirm the period.
+   - Bump `lastReviewed` in all three JSON files once signed off.
 1. ~~**Update the local remote.**~~ Done — `origin` is
    `https://github.com/OUPikappWeb-AG/AlphaGammaSite.git` (verified 2026-08-24).
 2. **Disable the Netlify Drawer** — Project configuration → Build & deploy →
@@ -353,17 +428,16 @@ Hosting is decided (Netlify — see Decisions). What is left, in order:
 
 ## Current status
 
-**Phase 0 and Phase 1 are code-complete but NOT deployed.** Build is clean; 3 pages generate.
+**Deployed on netlify.app; not yet on `oupikapp.com`.** The site is live at
+`https://musical-zabaione-49f618.netlify.app` (since 2026-08-21). The build is
+clean and **6 pages** generate as of 2026-09-28: index, join, history, housing,
+safety, and 404.
 
-Both phases' gates in `BUILD-SPEC.md` §10 are about *shipping*, not about code:
+Both phases' gates in `BUILD-SPEC.md` §10 are about *shipping*:
 
+- Phase 1 gate — "Shippable. Push it live." — met in substance on netlify.app.
 - Phase 0 gate — "Site resolves at `oupikapp.com` over HTTPS" — **not met.**
-- Phase 1 gate — "Shippable. Push it live." — **not met.**
-
-**The site is deployed and serving** at
-`https://musical-zabaione-49f618.netlify.app` (2026-08-21). Phase 1's "shippable"
-gate is met in substance; Phase 0's gate is not, because it names `oupikapp.com`
-specifically and DNS is still unpointed.
+  It names the domain specifically, and the domain still serves GoDaddy's page.
 
 Re-verified 2026-08-21 against the Vercel account, unchanged: one team
 (`nwschprojects-7699's projects`, a personal hobby account) holding one project
@@ -386,9 +460,18 @@ Measured 2026-08-24 (5 pages now — `/history` and `/housing` shipped):
 
 | Viewer | Eager hero (`house-front.jpg`) |
 |---|---|
-| Mobile, 640w | 39 KB |
+| Mobile at 1× density, 640w | 39 KB |
+| **Typical phone at 3× density, 1280w** | **~194 KB** |
 | Standard desktop, 1280w | 189 KB |
 | Retina desktop, 1920w | 392 KB |
+
+⚠️ The old "mobile = 39 KB" row was only true at 1× density, which almost no
+phone has. Measured 2026-09-28 on an emulated 360px, 3× phone: `/housing`
+transferred **503 KB** in total. Chrome's mobile lazy-load distance fetched both
+"lazy" grid photos immediately. That was before the grid `sizes` fix, which cuts
+those two roughly in half. First paint on the text pages has also grown to about
+**158 KB uncompressed** (about 124 KB brotli), from ~142 KB. The growth is HTML,
+not fonts.
 
 The other two photos are lazy. 392 KB on a retina hero is the accepted cost of
 the page whose entire job is showing a parent the building; the lever to halve
@@ -432,12 +515,11 @@ rule in `src/assets/photos/README.md`.
 under `oupikappweb`. See the transfer note below — and do not trust `git remote -v`
 to tell you this.
 
-```
-43e7299  Document push access decision and the misleading private-repo 404
-9f2a4a5  Initial commit: Phase 0 and Phase 1
-```
-
-- Remote is `https://github.com/oupikappweb/AlphaGammaSite.git`. The repo **exists and is private** — that is why an unauthenticated `git ls-remote` reported *repository not found*. It was never missing.
+- Remote is `https://github.com/OUPikappWeb-AG/AlphaGammaSite.git` and the
+  repo is **public** (since 2026-08-21; see Hosting). *Historical:* it was
+  once private under `oupikappweb`, which is why an unauthenticated
+  `git ls-remote` then reported *repository not found*. It was never missing.
+  Run `git log` for history; do not maintain a commit list here.
 - `.vs/` (Visual Studio local state, including a sqlite file) was accidentally caught by `git add -A` on the first commit. It is now in `.gitignore` and the root commit was amended to drop it. **Do not use bare `git add -A` here without checking `git status` first.**
 - **Commit identity is resolved** (2026-08-20) and set **repo-locally**, so the owner's personal global identity is untouched:
 
@@ -505,9 +587,10 @@ Kept for reference, since a future repo may need the same move:
 
 ## Deployment status — live on netlify.app, domain not yet pointed (2026-08-21)
 
-`oupikapp.com` **is registered at GoDaddy and the owner controls DNS.** It has
-never been pointed anywhere. **DNS stays at GoDaddy** — that constraint is what
-selected the host.
+`oupikapp.com` **is registered at GoDaddy and the owner controls DNS.** It is
+*not* unpointed. It serves a GoDaddy Website Builder page and carries live
+Microsoft 365 email; see "What is actually on `oupikapp.com` today" below.
+**DNS stays at GoDaddy** — that constraint is what selected the host.
 
 Vercel account state, re-checked 2026-08-21 and unchanged — kept only so nobody
 re-investigates it:
@@ -650,11 +733,49 @@ One Netlify caveat worth knowing: with external DNS, an apex domain cannot use
 Netlify's direct DNS routing, so Netlify recommends a subdomain as primary. For a
 3-page static site this is not worth reversing the nameserver decision over.
 
-### 🔴 Do not point `oupikapp.com` yet
+### 🔴 What is actually on `oupikapp.com` today (verified 2026-09-28)
 
-Every value in `chapter.json` is still `null`, so the Chapter Record — the one designed risk the whole page is built around — renders "Not yet reported" straight down the column. A parent landing on that during rush gets the *opposite* of the reassurance this site exists to create.
+**Earlier notes called the domain "never pointed anywhere". That was wrong.**
+Snapshot taken via 8.8.8.8 before cutover:
 
-Order to follow: **deploy to a `*.netlify.app` URL → wire in the real numbers → then point the domain.** The owner holds the GPA, service hours, Ability Experience dollars, and photos already.
+- **The apex serves a GoDaddy Website Builder "Launching Soon" page** from
+  *two* A records, `13.248.243.5` and `76.223.105.230`. `www` is a CNAME to the
+  apex.
+  - **Unpublish the builder site, or disconnect the domain from it, *before*
+    editing DNS.** Otherwise GoDaddy can lock or re-add its A records.
+  - **Replace both A records.** One left behind round-robins about half of
+    visitors to GoDaddy.
+  - Re-check DNS the next day.
+- **The domain already runs live Microsoft 365 email**, set up through GoDaddy
+  (tenant `NETORG19591553.onmicrosoft.com`) and filtered by Proofpoint:
+  - MX records `mx1/2/3-usg2.ppe-hosted.com`
+  - SPF, and DMARC at `p=quarantine`
+  - `autodiscover`, `lyncdiscover`, `sip`, `msoid`, two SRV records, `email`,
+    `pay`, `_domainconnect`
+
+  **Touch none of them.** Someone set up a mailbox on this domain. **Owner:
+  find out whose it is.** It bears on account ownership (spec §7), and a real
+  `@oupikapp.com` address may already exist for `chapterEmail`.
+- No CAA, no AAAA, no DNSSEC, so nothing blocks Netlify's Let's Encrypt
+  certificate. `app.oupikapp.com` is NXDOMAIN; leave it.
+- Registration: GoDaddy, expires **2028-09-10**, registrar lock on. Auto-renew
+  status and the paying card are not visible from outside. Check them in the
+  account.
+- The OG image and canonicals point at `oupikapp.com`, which 404s from GoDaddy
+  until cutover. **Don't share links for feedback until then.** Facebook and
+  LinkedIn cache the missing preview for days.
+
+Cutover order:
+
+1. Disable the Netlify Drawer.
+2. Export the GoDaddy zone.
+3. Unpublish the builder.
+4. Add `oupikapp.com` in Netlify as primary.
+5. Swap both A records for the dashboard IP, and point `www` at the netlify.app
+   host.
+6. Add the netlify.app → `oupikapp.com` 301 to `netlify.toml`.
+7. Verify HSTS, the `www` redirect, `/og-default.png`, and that the Drawer is
+   gone.
 
 ---
 
@@ -669,17 +790,24 @@ Order to follow: **deploy to a `*.netlify.app` URL → wire in the real numbers 
    - Email alias: unconfirmed.
    - The two-admin rule is met nowhere yet.
 4. ~~**Vercel Pro vs. Cloudflare Pages/Netlify.**~~ Resolved 2026-08-21 — **Netlify**, free tier, DNS staying at GoDaddy. See the Hosting decision table. This is a documented deviation from `BUILD-SPEC.md` §8, which assumes Vercel throughout; the spec's DNS warnings still apply verbatim, only the record values change. Note it also splits hosting away from ChapterLink, which is on Vercel — acceptable here because this site is `output: 'static'` with no adapter, no functions and no runtime, so there is nothing for the two to share.
-5. **Content still uncollected:** founding year, dues breakdown, comparison GPAs, retention/graduation rates, alumni outcomes, recruitment chair details, house address, Instagram handle, anti-hazing paragraph, and whether national HQ permits use of official marks. Full list in `BUILD-SPEC.md` §11.
+5. **Content still uncollected** (as of 2026-09-28):
+   - what the dues include, and hardship notes
+   - the all-men's GPA average (not in OU's scholarship report)
+   - retention and graduation rates
+   - service hours
+   - alumni outcomes
+   - a named chapter or alumni advisor, and whether there is a house director or live-in adult
+   - the owner's revision of the `/safety` statement
+   - whether national HQ permits use of official marks
 
-The owner has confirmed they hold service hours, Ability Experience dollars, and
-GPA figures — still to be wired in. **Photos are done** (2026-08-24): three house
-photographs are live on `/housing`.
+   Full list in `BUILD-SPEC.md` §11. Already in: founding year, address,
+   Instagram, GPA with comparison, photos.
 
 ---
 
 ## Working preferences
 
-The owner has asked for: **questions over assumptions**, thoroughness over speed, industry-standard code, and placeholder "Example" copy rather than invented prose. Surface trade-offs and let them decide rather than quietly picking.
+The owner has asked for: **questions over assumptions**, thoroughness over speed, and industry-standard code. Surface trade-offs and let them decide rather than quietly picking. (The earlier request for placeholder "Example" copy was superseded on 2026-09-09; see hard rule 3.)
 
 ---
 

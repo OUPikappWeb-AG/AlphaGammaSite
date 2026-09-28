@@ -9,7 +9,7 @@
  * import statement, no path. Alt text is required by the type signature
  * because an image without it is unusable to a screen reader.
  *
- * Before committing any photo, see the photo rules in EDITING.md:
+ * Before committing any photo, see the photo rules in src/assets/photos/README.md:
  * max 2000px wide, under 400KB, no alcohol visible, consent for anyone
  * identifiable.
  *
@@ -33,12 +33,26 @@ interface Props {
   alt: string;
   /** Optional visible caption, set in mono beneath the image. */
   caption?: string;
+  /**
+   * How wide the image renders, for the browser to pick a file. The default
+   * matches a full-width band (the 1152px container less its padding). Pass a
+   * narrower value when the photo sits in a grid, or the browser downloads a
+   * file about twice as wide as it needs.
+   */
+  sizes?: string;
   /** Set true only for an above-the-fold image, to skip lazy loading. */
   priority?: boolean;
   class?: string;
 }
 
-const { src, alt, caption, priority = false, class: className = '' } = Astro.props;
+const {
+  src,
+  alt,
+  caption,
+  sizes = '(min-width: 1152px) 1088px, calc(100vw - 40px)',
+  priority = false,
+  class: className = '',
+} = Astro.props;
 
 // Throws a build error naming the available files if the filename is wrong.
 const image = getPhoto(src);
@@ -49,7 +63,7 @@ const image = getPhoto(src);
     src={image}
     alt={alt}
     widths={[640, 960, 1280, 1920]}
-    sizes="(min-width: 1152px) 1152px, 100vw"
+    sizes={sizes}
     quality={65}
     loading={priority ? 'eager' : 'lazy'}
     fetchpriority={priority ? 'high' : 'auto'}

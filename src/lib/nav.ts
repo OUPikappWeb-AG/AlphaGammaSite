@@ -26,6 +26,7 @@ export const navItems: readonly NavItem[] = [
   { label: 'Housing', href: '/housing', ready: true },
   { label: 'Ability Experience', href: '/ability-experience', ready: false },
   { label: 'For Parents', href: '/parents', ready: false },
+  { label: 'Safety', href: '/safety', ready: true },
   { label: 'Join', href: '/join', ready: true },
 ];
 

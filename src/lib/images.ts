@@ -58,7 +58,7 @@ export function getPhoto(filename: string): ImageMetadata {
         (available.length
           ? `Available photos:\n${available.map((f) => `  • ${f}`).join('\n')}\n`
           : `That folder currently has no photos in it.\n`) +
-        `\nCheck the spelling, including the file extension. See EDITING.md.\n`,
+        `\nCheck the spelling, including the file extension. See src/assets/photos/README.md.\n`,
     );
   }
 

@@ -4,7 +4,7 @@
  *
  * Two audiences read this page: a student deciding whether to reach out, and
  * a parent checking whether reaching out is safe and sensible. It therefore
- * ends with a named human and a real email address, which is the single most
+ * ends with a real email address that reaches a person, which is the single most
  * effective anxiety-to-conversation converter available to us.
  *
  * Deliberately NO dates, times, or locations for events — spec §1 rules out a
@@ -16,7 +16,6 @@ import { chapter, isTodo } from '../lib/chapter';
 
 const { recruitmentChair } = chapter.contact;
 
-const chairName = isTodo(recruitmentChair.name) ? 'Recruitment Chair' : recruitmentChair.name;
 const hasEmail = !isTodo(recruitmentChair.email);
 const hasPhone = !isTodo(recruitmentChair.phone);
 
@@ -28,7 +27,7 @@ const hasPhone = !isTodo(recruitmentChair.phone);
 const steps = [
   {
     title: 'Get in touch',
-    body: 'Email our recruitment chair, or find us at an event on campus. Tell him your name and your year. There is no application to fill out at this stage, and nothing is expected of you afterwards.',
+    body: 'Email our recruitment chair, or find us at an event on campus or on Instagram. Tell him your name and your year. There is no application to fill out at this stage, and nothing is expected of you afterwards.',
   },
   {
     title: 'Come to the house',
@@ -81,6 +80,12 @@ const steps = [
         ))
       }
     </ol>
+
+    <p class="mt-6 max-w-2xl text-[0.9375rem] leading-relaxed text-slate">
+      The rules the new member period is held to, and how to report anything that breaks them
+      without going through us, are on our{' '}
+      <a href="/safety" class="text-royal underline underline-offset-4">safety and conduct page</a>.
+    </p>
   </section>
 
   <!-- ── Contact a real person ─────────────────────────────────────── -->
@@ -102,10 +107,14 @@ const steps = [
         </div>
 
         <div class="border-l-2 border-gold pl-6 sm:pl-8">
+          <!--
+            The role, not a name. Names go stale at every officer turnover and
+            publish a private student; the role and its inbox do not.
+          -->
           <p class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-slate">
-            Recruitment chair
+            Write to
           </p>
-          <p class="mt-2 text-2xl">{chairName}</p>
+          <p class="mt-2 text-2xl">Our recruitment chair</p>
 
           <dl class="mt-6 space-y-3 text-base">
             {

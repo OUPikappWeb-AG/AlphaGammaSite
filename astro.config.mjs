@@ -7,8 +7,8 @@ import tailwindcss from '@tailwindcss/vite';
 /**
  * Astro configuration.
  *
- * You should rarely need to edit this file. Content lives in src/data and
- * src/content; see EDITING.md.
+ * You should rarely need to edit this file. Content lives in src/data, and
+ * what each field expects is documented in the matching *.schema.ts file.
  */
 export default defineConfig({
   /**

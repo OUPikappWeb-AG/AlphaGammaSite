@@ -18,7 +18,8 @@ function load(): Housing {
 
     throw new Error(
       `\nsrc/data/housing.json is not valid.\n\n${problems}\n\n` +
-        `Fix the fields listed above, then commit again. See EDITING.md.\n`,
+        `Fix the fields listed above, then commit again. What each field expects\n` +
+        `is documented in src/data/housing.schema.ts.\n`,
     );
   }
 

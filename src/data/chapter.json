@@ -16,9 +16,18 @@
     "instagram": "https://instagram.com/oupikapp"
   },
 
+  "safety": {
+    "ouReportForm": "https://www.ou.edu/stop-hazing/report-an-incident",
+    "ouHotline": "(844) 428 6531",
+    "ouTransparencyReport": "https://www.ou.edu/stop-hazing/reports",
+    "ouPolicies": "https://www.ou.edu/stop-hazing/laws-and-policies",
+    "oklahomaStatute": "https://law.justia.com/codes/oklahoma/title-21/section-21-1190/",
+    "nationalReport": "https://pikapp.org/members/report-a-concern/",
+    "nationalPositions": "https://pikapp.org/members/undergraduates/prevention-accountability/statements-of-position/"
+  },
+
   "contact": {
     "recruitmentChair": {
-      "name": "Blake Wylie",
       "email": "pikappaphiatou@gmail.com",
       "phone": "TODO"
     },
@@ -27,9 +36,9 @@
   },
 
   "academics": {
-    "chapterGPA":       { "value": 3.23, "asOf": "Spring 2026", "source": "OU Fraternity & Sorority Programs report" },
-    "allMensAverage":   { "value": null, "asOf": "TODO", "source": "OU Fraternity & Sorority Programs report" },
-    "allFraternityAvg": { "value": null, "asOf": "TODO", "source": "OU Fraternity & Sorority Programs report" },
+    "chapterGPA":       { "value": 3.0016, "asOf": "Spring 2026", "source": "OU Fraternity and Sorority Programs, Spring 2026 Community Scholarship Report" },
+    "allMensAverage":   { "value": null, "asOf": "TODO", "source": "Not in the OU scholarship report; needs another source" },
+    "allFraternityAvg": { "value": 3.2662, "asOf": "Spring 2026", "source": "OU Fraternity and Sorority Programs, Spring 2026 Community Scholarship Report" },
     "retentionRate":    { "value": null, "asOf": "TODO", "source": "Chapter records" },
     "gradRate":         { "value": null, "asOf": "TODO", "source": "Chapter records" }
   },

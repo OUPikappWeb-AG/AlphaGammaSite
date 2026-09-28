@@ -32,6 +32,7 @@ const fullTitle = `${title} · ${siteName}`;
 
 const canonical = canonicalUrl(Astro.url.pathname, Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site).href;
+const ogImageAlt = `${chapter.identity.chapterName} Chapter of Pi Kappa Phi at the ${chapter.identity.school}`;
 
 /**
  * Structured data. Search engines use this to understand what organization
@@ -58,11 +59,21 @@ const jsonLd: Record<string, unknown> = {
 };
 
 if (!isTodo(chapter.contact.houseAddress)) {
+  /*
+   * chapter.json holds the address as one human-readable line, e.g.
+   * "736 Elm Ave, Norman, OK 73069". Search engines want the street on its
+   * own, so take the part before the first comma and the trailing ZIP code.
+   * If the line ever stops matching that shape, the street field simply
+   * carries the whole line, which is still valid.
+   */
+  const line = chapter.contact.houseAddress;
+  const zip = line.match(/\b(\d{5})(?:-\d{4})?\s*$/)?.[1];
   jsonLd.address = {
     '@type': 'PostalAddress',
-    streetAddress: chapter.contact.houseAddress,
+    streetAddress: line.includes(',') ? line.split(',')[0].trim() : line,
     addressLocality: 'Norman',
     addressRegion: 'OK',
+    postalCode: zip,
     addressCountry: 'US',
   };
 }
@@ -76,7 +87,7 @@ if (!isTodo(chapter.contact.houseAddress)) {
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {!noindex && <link rel="canonical" href={canonical} />}
     {noindex && <meta name="robots" content="noindex, follow" />}
 
     <!--
@@ -90,16 +101,18 @@ if (!isTodo(chapter.contact.houseAddress)) {
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta property="og:locale" content="en_US" />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -107,8 +120,9 @@ if (!isTodo(chapter.contact.houseAddress)) {
     <link rel="sitemap" href="/sitemap-index.xml" />
 
     <!--
-      Swap the .no-js class before first paint. Anything that would otherwise
-      be hidden by a scroll-reveal stays visible if this never runs.
+      Remove .no-js before first paint. While it is present, global.css shows
+      the mobile menu open and hides the Menu button, so every page stays
+      reachable on a phone with JavaScript off.
     -->
     <script is:inline>
       document.documentElement.classList.remove('no-js');
@@ -127,7 +141,7 @@ if (!isTodo(chapter.contact.houseAddress)) {
 
     <Nav />
 
-    <main id="main" class="flex-1">
+    <main id="main" tabindex="-1" class="flex-1 focus:outline-none">
       <slot />
     </main>
 

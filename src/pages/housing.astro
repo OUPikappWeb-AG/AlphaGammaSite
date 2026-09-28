@@ -77,7 +77,12 @@ const hasAddress = !isTodo(address);
         {rest.length > 0 && (
           <div class="mt-6 grid gap-6 sm:grid-cols-2">
             {rest.map((photo) => (
-              <PhotoBand src={photo.file} alt={photo.alt} caption={photo.caption} />
+              <PhotoBand
+                src={photo.file}
+                alt={photo.alt}
+                caption={photo.caption}
+                sizes="(min-width: 1152px) 532px, (min-width: 640px) calc(50vw - 44px), calc(100vw - 40px)"
+              />
             ))}
           </div>
         )}
@@ -107,7 +112,7 @@ const hasAddress = !isTodo(address);
         </div>
 
         <CTAButton href={chapter.links.properties} variant="outline" external class="shrink-0">
-          Visit the site
+          Pi Kappa Phi Properties
         </CTAButton>
       </div>
     </div>

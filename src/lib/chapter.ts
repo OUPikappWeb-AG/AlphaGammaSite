@@ -23,7 +23,8 @@ function load(): Chapter {
 
     throw new Error(
       `\nsrc/data/chapter.json is not valid.\n\n${problems}\n\n` +
-        `Fix the fields listed above, then commit again. See EDITING.md.\n`,
+        `Fix the fields listed above, then commit again. What each field expects\n` +
+        `is documented in src/data/chapter.schema.ts.\n`,
     );
   }
 
@@ -45,8 +46,8 @@ export const isTodo = (value: string): boolean => value.trim() === TODO;
 /**
  * True when a statistic has no reported value yet.
  *
- * Components use this to render an honest "Not yet reported" rather than a
- * misleading "0". Never publish a zero you did not measure.
+ * The Chapter Record uses this to leave the line out entirely rather than
+ * print a misleading "0". Never publish a zero you did not measure.
  */
 export const isPending = (s: Stat): boolean => s.value === null;
 
@@ -147,7 +148,7 @@ export function formatAsOf(s: Stat): string | null {
  * This is deliberately OPT-IN, because the site ships to production during
  * Phase 1 while most values are still being collected — a hard failure now
  * would block the very deploys we need. Turn it on for real launch by setting
- * STRICT_CONTENT=1 in the Vercel project's environment variables. From that
+ * STRICT_CONTENT=1 in the Netlify site's environment variables. From that
  * point on, any TODO left in a launch-critical field fails the build.
  * ------------------------------------------------------------------ */
 
@@ -155,7 +156,6 @@ export function formatAsOf(s: Stat): string | null {
 const LAUNCH_CRITICAL: ReadonlyArray<readonly [label: string, value: string]> = [
   ['identity.founded', chapter.identity.founded],
   ['links.instagram', chapter.links.instagram],
-  ['contact.recruitmentChair.name', chapter.contact.recruitmentChair.name],
   ['contact.recruitmentChair.email', chapter.contact.recruitmentChair.email],
   ['contact.chapterEmail', chapter.contact.chapterEmail],
   ['contact.houseAddress', chapter.contact.houseAddress],
@@ -168,7 +168,9 @@ export function pendingLaunchFields(): string[] {
 
 /** Throws when STRICT_CONTENT is set and placeholders remain. */
 export function assertLaunchReady(): void {
-  if (!import.meta.env.STRICT_CONTENT) return;
+  // Compare to '1' exactly. Environment variables are strings, so a bare
+  // truthiness test would treat STRICT_CONTENT=0 as "on".
+  if (import.meta.env.STRICT_CONTENT !== '1') return;
 
   const pending = pendingLaunchFields();
   if (pending.length === 0) return;

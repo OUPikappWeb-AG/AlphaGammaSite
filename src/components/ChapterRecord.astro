@@ -17,6 +17,12 @@ import StatLine from './StatLine.astro';
 
 const { academics, service, abilityExperience, membership } = chapter;
 
+/**
+ * The second column is only titled "Service" once a service figure is
+ * actually reported. Until then it would promise a number it does not show.
+ */
+const hasService = !isPending(service.hoursPerYear) || !isPending(service.hoursPerMember);
+
 const allColumns = [
   {
     heading: 'Academics',
@@ -39,7 +45,7 @@ const allColumns = [
     ],
   },
   {
-    heading: 'Service and chapter',
+    heading: hasService ? 'Service and chapter' : 'Philanthropy and chapter',
     stats: [
       {
         label: 'Service hours',
@@ -165,8 +171,10 @@ const hasRecord = columns.length > 0;
    *
    * `prefers-reduced-motion` is honoured in CSS, which neutralises the
    * transition entirely, so this script's class toggle becomes a no-op for
-   * anyone who has asked for less movement. If the script never runs, the
-   * `.no-js` rule in global.css leaves everything visible.
+   * anyone who has asked for less movement.
+   *
+   * Nothing is hidden until this script adds `.reveal-ready` below, so if it
+   * never runs, or throws before that line, the record stays visible.
    */
   const targets = document.querySelectorAll<HTMLElement>('.reveal');
 
@@ -186,6 +194,15 @@ const hasRecord = columns.length > 0;
       { rootMargin: '0px 0px -10% 0px', threshold: 0.1 },
     );
 
-    targets.forEach((el) => observer.observe(el));
+    // Anything already on screen when this runs was painted visible, so it is
+    // marked revealed first. Otherwise it would blink out and fade back in.
+    targets.forEach((el) => {
+      if (el.getBoundingClientRect().top < window.innerHeight) reveal(el);
+    });
+
+    document.documentElement.classList.add('reveal-ready');
+    targets.forEach((el) => {
+      if (!el.classList.contains('is-visible')) observer.observe(el);
+    });
   }
 </script>
