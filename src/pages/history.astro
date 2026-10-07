@@ -10,21 +10,22 @@
  * self-evidently the former, and unlike almost everything else a fraternity
  * might claim about itself, it is a matter of public record.
  *
- * WHY THE HEADLINE NUMBER IS NOT WRITTEN ANYWHERE
- * ----------------------------------------------
- * "Over 100 years at OU" is derived from `identity.founded` via
- * `yearsOnCampus()`. It is never typed, so it can never go stale, and it is
- * simply not shown while the charter year is still TODO. Hard rule 1: an
- * unverified date does not get guessed at, least of all the one doing the
- * most persuading.
+ * WHY THE HEADLINE IS THE CHARTER YEAR, NOT A COUNT OF YEARS
+ * ---------------------------------------------------------
+ * The chapter was active 1923 to 1938, 1971 to 1984, 1988 to 2007 and again
+ * from 2011 (owner supplied, 2026-10-06; matches OU's IFC page and the
+ * public chapter list). A "years at OU" figure counted from 1923 would
+ * include about forty dormant years, directly under a paragraph that
+ * promises not to round the history off. The charter year is true whatever
+ * the gaps, comes from `identity.founded`, and is not shown while that is
+ * still TODO. Do not bring back `yearsOnCampus()` here.
  */
 import Base from '../layouts/Base.astro';
 import Timeline from '../components/Timeline.astro';
 import CTAButton from '../components/CTAButton.astro';
-import { chapter, yearsOnCampus, foundedYear } from '../lib/chapter';
+import { chapter, foundedYear } from '../lib/chapter';
 import { milestones, hasMilestones } from '../lib/history';
 
-const years = yearsOnCampus();
 const founded = foundedYear();
 const entries = milestones();
 ---
@@ -44,33 +45,32 @@ const entries = milestones();
     <div class="mt-8 h-px w-24 bg-gold" aria-hidden="true"></div>
 
     <p class="mt-8 max-w-2xl text-lg leading-relaxed text-slate">
-      Alpha Gamma is the 23rd chapter of Pi Kappa Phi, chartered at the University of Oklahoma in
-      1923. It closed in 1936, when the Depression made it impossible to keep going, and it was
-      rechartered in 1969 in a house at 1714 Chautauqua Avenue. For a time the chapter rented half
-      of that third floor to the women of Alpha Gamma Delta, which we believe made it the only
-      Pi Kappa Phi chapter living coed. In 1980 the national fraternity named Alpha Gamma a Master
-      Chapter. The century has not been unbroken, and we would rather say so than round it off.
+      Alpha Gamma is the 27th chapter of Pi Kappa Phi, chartered at the University of Oklahoma in
+      1923. The chapter has closed three times and come back three times. It was active from 1923
+      to 1938, from 1971 to 1984, and from 1988 to 2007, and it has been active again since 2011.
+      In both the 1971 and the 1988 periods its house was at 1714 Chautauqua Avenue. The century
+      has not been unbroken, and we would rather say so than round it off.
     </p>
   </section>
 
   <!--
-    ── The longevity figure ───────────────────────────────────────────
+    ── The charter year ───────────────────────────────────────────────
     Rendered only when the charter year is known. While `founded` is TODO
     this whole band is omitted rather than shown empty, because a hedged
     version of this claim is worth less than no claim at all.
   -->
   {
-    years !== null && founded !== null && (
+    founded !== null && (
       <section aria-labelledby="longevity" class="border-y-2 border-gold bg-ink text-paper">
         <div class="mx-auto grid max-w-6xl gap-8 px-5 py-14 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-baseline sm:gap-14 sm:px-8 sm:py-16">
-          <p class="font-mono text-6xl leading-none text-gold sm:text-7xl">{years}</p>
+          <p class="font-mono text-6xl leading-none text-gold sm:text-7xl">{founded}</p>
 
           <div>
             <h2 id="longevity" class="text-2xl leading-snug sm:text-3xl">
-              years at the University of Oklahoma
+              chartered at the University of Oklahoma
             </h2>
             <p class="mt-3 font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-paper/70">
-              Chartered {founded} · Pi Kappa Phi founded {chapter.identity.nationalFounded}
+              Pi Kappa Phi founded {chapter.identity.nationalFounded}
             </p>
           </div>
         </div>

@@ -111,6 +111,11 @@ export function formatStat(s: Stat, format: StatFormat = 'integer'): string {
  *
  * Computed at build time. The site is static, so the number refreshes on the
  * next deploy, which the semester-review workflow will trigger anyway.
+ *
+ * ⚠️ Currently unused, on purpose (2026-10-06). The chapter was dormant
+ * 1938 to 1971, 1984 to 1988 and 2007 to 2011, so years since the charter
+ * overstates its time on campus by about forty years. `/history` shows the
+ * charter year instead. Do not render this without accounting for the gaps.
  */
 export function yearsOnCampus(asOf: Date = new Date()): number | null {
   if (isTodo(chapter.identity.founded)) return null;

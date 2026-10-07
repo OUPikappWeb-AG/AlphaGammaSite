@@ -84,7 +84,7 @@ These are non-negotiable. Several protect real people or the chapter's standing.
 
 1. **Never invent a statistic, name, date, or dollar figure.** Everything unknown stays `TODO` / `null`. The site's entire value is that its numbers are trustworthy.
 2. **No number is ever hardcoded in a component.** It comes from `chapter.json`, through `src/lib/chapter.ts`, and renders with its `asOf` stamp.
-3. ~~**Placeholder prose stays as text marked "Example."**~~ **Superseded 2026-09-09 — the owner asked for drafts.** There is no "Example" copy left on the site. What is there now is a first draft written to be revised, not final text. Do not revert it to placeholders, and do not raise its temperature: it is deliberately humble and deliberately dash-free (owner's request). Anything describing chapter conduct is still the owner's to sign off. The **anti-hazing statement** on `/safety` was drafted at the owner's explicit request on 2026-09-28 and is marked DRAFT in the page source: it must be revised by the owner, not polished by us.
+3. ~~**Placeholder prose stays as text marked "Example."**~~ **Superseded 2026-09-09 — the owner asked for drafts.** There is no "Example" copy left on the site. What is there now is a first draft written to be revised, not final text. Do not revert it to placeholders, and do not raise its temperature: it is deliberately humble and deliberately dash-free (owner's request). Anything describing chapter conduct is still the owner's to sign off. The **anti-hazing statement** on `/safety` was drafted at the owner's explicit request on 2026-09-28 and **approved by the owner as written on 2026-10-06**: any change to it is the owner's to make, not ours to polish.
 4. **A `TODO` must never render to a visitor.** Components omit placeholder fields instead. Verify after building (see Verification below).
 5. **No alcohol visible in any photo, ever.** Parent-facing site and national risk-management policy.
 6. **Every image requires meaningful alt text** — enforced by the `PhotoBand` prop type.
@@ -197,7 +197,7 @@ all-men's average in that report; `allMensAverage` stays `null`.
 | Decision | Rationale |
 |---|---|
 | **No student name on the site.** `recruitmentChair.name` removed from the schema and JSON; `/join` says "Our recruitment chair" | Owner's call. A name goes stale at every officer turnover and publishes a private student. Do not add it back. |
-| **New `/safety` page** + `chapter.json → safety` block | Owner asked for it. Almost everything on it points *outside* the chapter: Oklahoma statute 21 O.S. § 1190, OU's hazing policy, OU's federally required **Campus Hazing Transparency Report** (Pi Kappa Phi was not listed on it, 2026-09-28; the page links the report rather than claiming that, so it cannot go stale), Pi Kappa Phi's statement of position, and three report routes the chapter does not control. The "Where we stand" section is a **DRAFT for the owner**. |
+| **New `/safety` page** + `chapter.json → safety` block | Owner asked for it. Almost everything on it points *outside* the chapter: Oklahoma statute 21 O.S. § 1190, OU's hazing policy, OU's federally required **Campus Hazing Transparency Report** (Pi Kappa Phi was not listed on it, 2026-09-28; the page links the report rather than claiming that, so it cannot go stale), Pi Kappa Phi's statement of position, and three report routes the chapter does not control. The "Where we stand" section was a draft for the owner, **approved as written 2026-10-06**. |
 | Hero second button → `/safety` ("Safety and conduct") | It used to send a parent off-site to abilityexperience.org before they had scrolled. That section has its own link further down. |
 | Reveal hiding is now **opt-in** (`.reveal-ready` on `<html>`, set by the reveal script itself) | The old default hid `.reveal` and relied on `.no-js`, which a *different* script removed. Printing `/` produced a blank Chapter Record, and a failed module script would have hidden it permanently. Verified in headless Chrome: visible with JS off and in print. |
 | Mobile menu works **without JavaScript** | It used the `hidden` attribute, so with JS off a phone could reach no page but home. Now `.no-js` shows it open and hides the Menu button. It also moved inside the `<nav>` landmark. |
@@ -382,20 +382,23 @@ fixes from the pre-launch review are done (see "Pre-launch review and fixes").
 What is left before the domain goes live, in order:
 
 0. **Owner sign-off, blocking cutover:**
-   - Revise the DRAFT "Where we stand" statement on `/safety`.
-   - **`/history` has factual problems.** Wikipedia's chapter list and OU's
-     IFC page ("re-established in 2011") show the chapter active 1923–1938,
-     1971–1984, 1988–2007 and again since 2011. The page describes a single
-     1936–1969 closure. It also calls Alpha Gamma the "23rd chapter", where
-     the national charter order puts it 27th. The large "103 years at OU"
-     figure counts roughly 40 dormant years, directly under a paragraph that
-     promises not to round the history off. Unsourced: the Depression as the
-     cause, the 1980 "Master Chapter" award, and "only Pi Kappa Phi chapter
-     living coed". **The owner decides what to say; do not rewrite the
-     closure history without them.**
-   - `/housing`: confirm Pi Kappa Phi Properties actually owns 736 Elm (its
-     site does not list OU), and whether "owned and run by alumni" is accurate.
-     It is a staffed organization with a board.
+   - ~~Revise the DRAFT "Where we stand" statement on `/safety`.~~ **Approved
+     as written by the owner, 2026-10-06.** Any later change is still theirs.
+   - ~~**`/history` has factual problems.**~~ **Fixed 2026-10-06 with the
+     owner's dates:** active 1923–1938, 1971–1984, 1988–2007 and since 2011
+     (matches Wikipedia's chapter list and OU's IFC page), 27th chapter, not
+     23rd. Cut on the owner's instruction: the Depression as the cause, the
+     1980 "Master Chapter" award, and the coed claim. Do not restore them
+     without a source. The big "103 years at OU" figure counted about 40
+     dormant years, so the band now shows the charter year instead;
+     `yearsOnCampus()` is left in `chapter.ts`, unused on purpose.
+     ⚠️ One line to confirm: the owner wrote "1714 is bother for 1984 and
+     1988", read as 1714 Chautauqua being the house in both the 1971–1984
+     and 1988–2007 periods. The page says exactly that.
+   - `/housing`: ~~confirm Pi Kappa Phi Properties actually owns 736 Elm~~
+     **Owner confirmed 2026-10-06 that it does** (its site does not list OU, so
+     this rests on the owner's word). "Owned and run by alumni" was cut the
+     same day; it is a staffed organization with a board.
    - Dues: `includes`, whether rent or meals are covered, the payment-plan
      terms, and hardship `notes`. Then render them (they currently appear
      nowhere).
